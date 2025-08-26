@@ -76,7 +76,7 @@ export const updateQRCode = async (req: Request, res: Response, next: NextFuncti
     });
 
     if (!existingQRCode) {
-      res.status(404).json({
+      return res.status(404).json({
         status: "error",
         message: "QR code not found"
       });
@@ -124,7 +124,7 @@ export const deleteQRCode = async (req: Request, res: Response, next: NextFuncti
     });
 
     if (!existingQRCode) {
-      res.status(404).json({
+      return res.status(404).json({
         status: "error",
         message: "QR code not found"
       });
