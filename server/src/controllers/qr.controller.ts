@@ -2,9 +2,7 @@ import { Response, NextFunction, Request } from "express";
 import { AuthenticatedRequest } from "../types";
 import { QRCodeGenerator } from '../utils/qrCode';
 import { qrValidation } from "../validation";
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from "../config/db";
 
 export const createQRCode = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -78,7 +76,7 @@ export const updateQRCode = async (req: Request, res: Response, next: NextFuncti
     });
 
     if (!existingQRCode) {
-      return res.status(404).json({
+      res.status(404).json({
         status: "error",
         message: "QR code not found"
       });
@@ -126,7 +124,7 @@ export const deleteQRCode = async (req: Request, res: Response, next: NextFuncti
     });
 
     if (!existingQRCode) {
-      return res.status(404).json({
+      res.status(404).json({
         status: "error",
         message: "QR code not found"
       });
