@@ -76,10 +76,11 @@ export const updateQRCode = async (req: Request, res: Response, next: NextFuncti
     });
 
     if (!existingQRCode) {
-      return res.status(404).json({
+      res.status(404).json({
         status: "error",
         message: "QR code not found"
       });
+      return;
     }
 
     // If URL changed, regenerate QR code
@@ -122,12 +123,12 @@ export const deleteQRCode = async (req: Request, res: Response, next: NextFuncti
     const existingQRCode = await prisma.qRCode.findFirst({
       where: { id, userId }
     });
-
     if (!existingQRCode) {
-      return res.status(404).json({
+      res.status(404).json({
         status: "error",
         message: "QR code not found"
       });
+      return;
     }
 
     await prisma.qRCode.delete({
