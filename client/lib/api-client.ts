@@ -65,7 +65,18 @@ class ApiClient {
       })
 
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`)
+        let errorMessage = `API Error: ${response.status} ${response.statusText}`
+        try {
+          const errorData = await response.json()
+          if (errorData.message) {
+            errorMessage = errorData.message
+          } else if (errorData.error) {
+            errorMessage = errorData.error
+          }
+        } catch (e) {
+          // If response isn't JSON, use default error message
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
@@ -227,8 +238,28 @@ class ApiClient {
   }
 
   // QR Code
-  async generateQRCode(linkId: string) {
+  async generateQRCode(data: any) {
+    // For standalone QR code creation
+    const result = await this.request('/api/qr-codes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    return result
+  }
+
+  async getQRCodeForLink(linkId: string) {
     return this.request(`/api/links/generate-qr-code/${linkId}`, {}, true, 300000) // Cache for 5 minutes
+  }
+
+  async getQRCodes() {
+    return this.request('/api/qr-codes', {}, true, 30000) // Cache for 30 seconds
+  }
+
+  async deleteQRCode(id: string) {
+    const result = await this.request(`/api/qr-codes/${id}`, {
+      method: 'DELETE',
+    })
+    return result
   }
 
   // Utility method to clear cache

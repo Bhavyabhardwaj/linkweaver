@@ -68,7 +68,7 @@ import apiClient from "@/lib/api-client"
 const shortLinkSchema = z.object({
   url: z.string().url("Please enter a valid URL"),
   slug: z.string().optional(),
-  title: z.string().optional(),
+  title: z.string().min(1, "Title is required").max(100, "Title must be at most 100 characters"),
   description: z.string().optional(),
   password: z.string().optional(),
   expiresAt: z.string().optional(),
@@ -126,7 +126,7 @@ export default function ShortLinksPage() {
     defaultValues: {
       url: "",
       slug: "",
-      title: "",
+      title: "", // This will be required by validation
       description: "",
       password: "",
       expiresAt: "",
@@ -201,10 +201,40 @@ export default function ShortLinksPage() {
   const createShortLink = async (data: ShortLinkForm) => {
     setIsCreating(true)
     try {
-      const linkData = {
-        ...data,
-        expiresAt: expirationPreset !== "custom" ? generateExpirationDate(expirationPreset) : data.expiresAt,
+      // Prepare the link data
+      const linkData: any = {
+        url: data.url,
+        title: data.title, // Required field
       }
+
+      // Only add optional fields if they have values
+      if (data.slug && data.slug.trim()) {
+        linkData.slug = data.slug.trim()
+      }
+      
+      if (data.description && data.description.trim()) {
+        linkData.description = data.description.trim()
+      }
+      
+      if (data.password && data.password.trim()) {
+        linkData.password = data.password.trim()
+      }
+      
+      if (data.clickLimit && data.clickLimit > 0) {
+        linkData.clickLimit = data.clickLimit
+      }
+
+      // Handle expiration
+      if (expirationPreset !== "custom" && expirationPreset !== "never") {
+        const expirationDate = generateExpirationDate(expirationPreset)
+        if (expirationDate) {
+          linkData.expiresAt = new Date(expirationDate)
+        }
+      } else if (data.expiresAt && data.expiresAt.trim()) {
+        linkData.expiresAt = new Date(data.expiresAt)
+      }
+
+      console.log('Sending link data:', linkData)
 
       await apiClient.createShortLink(linkData)
       await loadShortLinks()
@@ -216,9 +246,10 @@ export default function ShortLinksPage() {
         description: "Your short link has been created successfully.",
       })
     } catch (error) {
+      console.error('Error creating short link:', error)
       toast({
         title: "Failed to create short link",
-        description: "There was an error creating your short link.",
+        description: error instanceof Error ? error.message : "There was an error creating your short link.",
         variant: "destructive",
       })
     } finally {

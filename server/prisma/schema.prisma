@@ -36,6 +36,7 @@ model User {
   // Relations
   links                Link[]
   linkClicks           linkClick[]
+  qrCodes              QRCode[]
 
   createdAt            DateTime    @default(now())
   updatedAt            DateTime    @updatedAt
@@ -107,6 +108,27 @@ model linkClick {
   @@index([country])
   @@index([device])
   @@index([clickDate])
+}
+
+model QRCode {
+  id              String   @id @default(cuid())
+  title           String
+  url             String
+  description     String?
+  size            Int      @default(300)
+  color           String   @default("#000000")
+  backgroundColor String   @default("#ffffff")
+  qrCodeUrl       String
+  scans           Int      @default(0)
+
+  // Relations
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
 }
 
 enum LinkType {

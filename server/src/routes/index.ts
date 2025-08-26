@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authRouter from "./auth.router";
 import linkRouter from "./link.router"; 
+import qrRouter from "./qr.router"; 
 import { isAuthenticated } from "../middlewares"; // for protected routes
 import publicRouter from "./public.router";
 import githubAuthRouter from "./githubAuth.router";
@@ -13,6 +14,7 @@ const router = Router();
 const apiRoutes = [
   { path: "/auth", route: authRouter },
   { path: "/links", route: linkRouter, isProtected: true },
+  { path: "/qr-codes", route: qrRouter, isProtected: true },
   { path: "/oauth", route: githubAuthRouter},
   { path: "/oauth", route: googleAuthRouter},
 ];

@@ -19,7 +19,10 @@ export const shortLinkValidator = z.object({
     .max(50, "Slug must be at most 50 characters")
     .regex(/^[a-zA-Z0-9_-]+$/, "Slug can only contain letters, numbers, hyphens, and underscores")
     .optional(),
-  expiresAt: z.date().optional(),
+  expiresAt: z.preprocess((val: any) => {
+    if (typeof val === 'string') return new Date(val);
+    return val;
+  }, z.date()).optional(),
   clickLimit: z.number().int().min(1).optional(),
   password: z.string().min(4).optional()
 })
@@ -37,13 +40,13 @@ export const linkUpdateValidator = z.object({
 })
 
 export const linkExpirationValidator = z.object({
-  expiresAt: z.date().refine(date => date > new Date(), {
+  expiresAt: z.date().refine((date: Date) => date > new Date(), {
     message: "Expiration date must be in the future"
   })
 })
 
 export const linkExpirationUpdateValidator = z.object({
-  expiresAt: z.date().nullable().optional().refine(date => !date || date > new Date(), {
+  expiresAt: z.date().nullable().optional().refine((date: Date | null | undefined) => !date || date > new Date(), {
     message: "Expiration date must be in the future"
   })
 })
