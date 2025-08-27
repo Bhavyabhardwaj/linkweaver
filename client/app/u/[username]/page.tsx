@@ -49,12 +49,47 @@ interface BioPageData {
   }
 }
 
-const theme = {
-  background: "bg-gradient-to-br from-[#f8fafc] via-[#e0e7ef] to-[#c7d2fe] dark:from-[#18181b] dark:via-[#23272f] dark:to-[#1e293b]",
-  card: "bg-white/80 dark:bg-[#23272f]/80 backdrop-blur-xl border border-white/30 dark:border-[#23272f]/40 shadow-2xl",
-  button: "bg-gradient-to-r from-[#6366f1] to-[#ec4899] text-white font-semibold hover:from-[#818cf8] hover:to-[#f472b6]",
-  text: "text-gray-900 dark:text-white",
-  accent: "from-[#6366f1] to-[#ec4899]",
+const themes = {
+  classic: {
+    name: "Classic",
+    background: "bg-gradient-to-br from-[#f8fafc] via-[#e0e7ef] to-[#c7d2fe] dark:from-[#18181b] dark:via-[#23272f] dark:to-[#1e293b]",
+    card: "bg-white/80 dark:bg-[#23272f]/80 backdrop-blur-xl border border-white/30 dark:border-[#23272f]/40 shadow-2xl",
+    button: "bg-gradient-to-r from-[#6366f1] to-[#ec4899] text-white font-semibold hover:from-[#818cf8] hover:to-[#f472b6]",
+    text: "text-gray-900 dark:text-white",
+    accent: "from-[#6366f1] to-[#ec4899]",
+  },
+  ocean: {
+    name: "Ocean",
+    background: "bg-gradient-to-br from-[#a7f3d0] via-[#38bdf8] to-[#6366f1]",
+    card: "bg-white/80 backdrop-blur-xl border border-blue-200 shadow-2xl",
+    button: "bg-gradient-to-r from-[#38bdf8] to-[#6366f1] text-white font-semibold hover:from-[#0ea5e9] hover:to-[#818cf8]",
+    text: "text-blue-900",
+    accent: "from-[#38bdf8] to-[#6366f1]",
+  },
+  sunset: {
+    name: "Sunset",
+    background: "bg-gradient-to-br from-[#fbc2eb] via-[#fcd34d] to-[#fda4af]",
+    card: "bg-white/80 backdrop-blur-xl border border-pink-200 shadow-2xl",
+    button: "bg-gradient-to-r from-[#f472b6] to-[#fcd34d] text-white font-semibold hover:from-[#f9a8d4] hover:to-[#fde68a]",
+    text: "text-pink-900",
+    accent: "from-[#f472b6] to-[#fcd34d]",
+  },
+  dark: {
+    name: "Dark",
+    background: "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700",
+    card: "bg-gray-800/90 backdrop-blur-xl border border-gray-700 shadow-2xl",
+    button: "bg-gradient-to-r from-[#6366f1] to-[#ec4899] text-white font-semibold hover:from-[#818cf8] hover:to-[#f472b6]",
+    text: "text-white",
+    accent: "from-[#6366f1] to-[#ec4899]",
+  },
+  forest: {
+    name: "Forest",
+    background: "bg-gradient-to-br from-[#d1fae5] via-[#6ee7b7] to-[#065f46]",
+    card: "bg-white/80 backdrop-blur-xl border border-green-200 shadow-2xl",
+    button: "bg-gradient-to-r from-[#34d399] to-[#065f46] text-white font-semibold hover:from-[#6ee7b7] hover:to-[#10b981]",
+    text: "text-green-900",
+    accent: "from-[#34d399] to-[#065f46]",
+  },
 }
 
 const socialIcons = {
@@ -70,6 +105,7 @@ export default function PublicBioPage({ params }: { params: { username: string }
   const [bioData, setBioData] = useState<BioPageData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedTheme, setSelectedTheme] = useState<string>('classic')
   const { toast } = useToast()
 
   // Unwrap params if it's a Promise (Next.js App Router dynamic route)
@@ -87,6 +123,20 @@ export default function PublicBioPage({ params }: { params: { username: string }
   useEffect(() => {
     if (username) loadBioData(username);
   }, [username]);
+
+  // Set theme from user data if available
+  useEffect(() => {
+    if (bioData && bioData.theme && themes[bioData.theme]) {
+      setSelectedTheme(bioData.theme)
+    }
+  }, [bioData])
+
+  // Save theme selection (simulate API call)
+  const handleThemeChange = async (themeKey: string) => {
+    setSelectedTheme(themeKey)
+    // TODO: Call API to persist theme for user (if authenticated/owner)
+    // await apiClient.updateUserTheme(username, themeKey)
+  }
 
   const mapBackendToBioData = (data: any): BioPageData => {
     // Map backend fields to frontend expected fields
@@ -208,7 +258,7 @@ export default function PublicBioPage({ params }: { params: { username: string }
     )
   }
 
-  const currentTheme = theme
+  const currentTheme = themes[selectedTheme as keyof typeof themes] || themes.classic
 
   return (
     <>
@@ -226,6 +276,18 @@ export default function PublicBioPage({ params }: { params: { username: string }
       </Head>
 
       <div className={`min-h-screen ${currentTheme.background} py-10 px-4 flex flex-col items-center relative`}>
+        {/* Theme Picker (show only if user is owner, here always for demo) */}
+        <div className="flex gap-2 mb-8 mt-2 flex-wrap justify-center">
+          {Object.entries(themes).map(([key, theme]) => (
+            <button
+              key={key}
+              className={`rounded-full px-4 py-1 text-xs font-semibold border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${selectedTheme === key ? 'border-pink-500 bg-gradient-to-r ' + theme.accent + ' text-white shadow-lg scale-105' : 'border-transparent bg-white/30 text-gray-700 hover:scale-105'}`}
+              onClick={() => handleThemeChange(key)}
+            >
+              {theme.name}
+            </button>
+          ))}
+        </div>
         {/* Blurred background accent */}
         <div className="absolute inset-0 -z-10 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-[#6366f1]/30 to-[#ec4899]/30 rounded-full blur-3xl opacity-60" />
