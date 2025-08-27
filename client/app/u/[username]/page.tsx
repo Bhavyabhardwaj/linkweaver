@@ -49,37 +49,12 @@ interface BioPageData {
   }
 }
 
-const themes = {
-  linktree: {
-    background: "bg-gradient-to-br from-green-50 to-emerald-100",
-    card: "bg-white/80 backdrop-blur-sm",
-    button: "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200",
-    text: "text-gray-900",
-  },
-  minimal: {
-    background: "bg-white",
-    card: "bg-white",
-    button: "bg-gray-100 hover:bg-gray-200 text-gray-900",
-    text: "text-gray-900",
-  },
-  dark: {
-    background: "bg-gradient-to-br from-gray-900 to-black",
-    card: "bg-gray-800/80 backdrop-blur-sm",
-    button: "bg-gray-700 hover:bg-gray-600 text-white",
-    text: "text-white",
-  },
-  neon: {
-    background: "bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900",
-    card: "bg-black/50 backdrop-blur-sm border border-purple-500/20",
-    button: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white",
-    text: "text-white",
-  },
-  nature: {
-    background: "bg-gradient-to-br from-green-100 to-emerald-200",
-    card: "bg-white/90 backdrop-blur-sm",
-    button: "bg-green-500 hover:bg-green-600 text-white",
-    text: "text-green-900",
-  },
+const theme = {
+  background: "bg-gradient-to-br from-[#f8fafc] via-[#e0e7ef] to-[#c7d2fe] dark:from-[#18181b] dark:via-[#23272f] dark:to-[#1e293b]",
+  card: "bg-white/80 dark:bg-[#23272f]/80 backdrop-blur-xl border border-white/30 dark:border-[#23272f]/40 shadow-2xl",
+  button: "bg-gradient-to-r from-[#6366f1] to-[#ec4899] text-white font-semibold hover:from-[#818cf8] hover:to-[#f472b6]",
+  text: "text-gray-900 dark:text-white",
+  accent: "from-[#6366f1] to-[#ec4899]",
 }
 
 const socialIcons = {
@@ -233,7 +208,7 @@ export default function PublicBioPage({ params }: { params: { username: string }
     )
   }
 
-  const currentTheme = themes[bioData.theme as keyof typeof themes] || themes.neon
+  const currentTheme = theme
 
   return (
     <>
@@ -250,7 +225,11 @@ export default function PublicBioPage({ params }: { params: { username: string }
         <meta name="twitter:description" content={bioData.bio} />
       </Head>
 
-      <div className={`min-h-screen ${currentTheme.background} py-8 px-4`}>
+      <div className={`min-h-screen ${currentTheme.background} py-10 px-4 flex flex-col items-center relative`}>
+        {/* Blurred background accent */}
+        <div className="absolute inset-0 -z-10 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-[#6366f1]/30 to-[#ec4899]/30 rounded-full blur-3xl opacity-60" />
+        </div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -259,21 +238,22 @@ export default function PublicBioPage({ params }: { params: { username: string }
         >
           {/* Profile Section */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className={`${currentTheme.card} rounded-2xl p-6 mb-6 text-center`}
+            className={`${currentTheme.card} rounded-2xl p-8 mb-8 text-center shadow-2xl border border-white/30 relative overflow-hidden max-w-md mx-auto`}
+            style={{ backdropFilter: 'blur(16px)' }}
           >
-            <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-white/20">
+            <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-white/40 shadow-lg">
               <AvatarImage src={bioData.avatar || "/placeholder.svg"} alt={bioData.displayName} />
-              <AvatarFallback className="text-2xl font-bold">
+              <AvatarFallback className="text-3xl font-bold">
                 {bioData.displayName.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
-            <h1 className={`text-2xl font-bold mb-2 ${currentTheme.text}`}>{bioData.displayName}</h1>
+            <h1 className={`text-3xl font-extrabold mb-2 tracking-tight ${currentTheme.text}`}>{bioData.displayName}</h1>
 
-            <p className={`${currentTheme.text} opacity-80 mb-4 leading-relaxed`}>{bioData.bio}</p>
+            <p className={`${currentTheme.text} opacity-80 mb-4 leading-relaxed text-base`}>{bioData.bio}</p>
 
             {/* Social Links */}
             {Object.keys(bioData.socialLinks).length > 0 && (
@@ -286,7 +266,7 @@ export default function PublicBioPage({ params }: { params: { username: string }
                       key={platform}
                       variant="ghost"
                       size="sm"
-                      className={`w-10 h-10 p-0 rounded-full ${currentTheme.text} hover:bg-white/10`}
+                      className={`w-10 h-10 p-0 rounded-full ${currentTheme.text} hover:bg-white/20 border border-white/30 shadow-md bg-white/10`}
                       onClick={() => window.open(url, "_blank")}
                     >
                       <Icon className="w-5 h-5" />
@@ -297,24 +277,20 @@ export default function PublicBioPage({ params }: { params: { username: string }
             )}
 
             {/* Stats */}
-            <div className="flex justify-center gap-6 text-sm">
-              <div className={`${currentTheme.text} opacity-70`}>
-                <div className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  <span>{bioData.analytics.totalViews.toLocaleString()} views</span>
-                </div>
+            <div className="flex justify-center gap-8 text-base mt-4">
+              <div className={`${currentTheme.text} opacity-80 flex items-center gap-2`}>
+                <Eye className="w-5 h-5" />
+                <span>{bioData.analytics.totalViews.toLocaleString()} views</span>
               </div>
-              <div className={`${currentTheme.text} opacity-70`}>
-                <div className="flex items-center gap-1">
-                  <ExternalLink className="w-4 h-4" />
-                  <span>{bioData.analytics.totalClicks.toLocaleString()} clicks</span>
-                </div>
+              <div className={`${currentTheme.text} opacity-80 flex items-center gap-2`}>
+                <ExternalLink className="w-5 h-5" />
+                <span>{bioData.analytics.totalClicks.toLocaleString()} clicks</span>
               </div>
             </div>
           </motion.div>
 
           {/* Links Section */}
-          <div className="space-y-4">
+          <div className="space-y-5 w-full max-w-md mx-auto">
             {bioData.links
               .filter((link) => link.active)
               .map((link, index) => (
@@ -324,25 +300,24 @@ export default function PublicBioPage({ params }: { params: { username: string }
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + index * 0.1, duration: 0.6 }}
                 >
-                  <Button
+                  <button
                     onClick={() => handleLinkClick(link)}
-                    className={`w-full h-auto p-4 ${currentTheme.button} rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
-                    variant="ghost"
+                    className={`w-full h-auto p-0 group rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] ${currentTheme.button} relative overflow-hidden border border-white/30 backdrop-blur-xl`}
+                    style={{ minHeight: 60 }}
                   >
-                    <div className="flex items-center gap-4 w-full">
+                    <div className="flex items-center gap-4 w-full px-6 py-4">
                       {link.icon && <div className="text-2xl flex-shrink-0">{link.icon}</div>}
                       <div className="flex-1 text-left">
-                        <div className="font-semibold text-base mb-1">{link.title}</div>
-                        {link.description && <div className="text-sm opacity-70">{link.description}</div>}
+                        <div className="font-semibold text-lg mb-1 text-white drop-shadow-lg">{link.title}</div>
+                        {link.description && <div className="text-sm text-white/80">{link.description}</div>}
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <Badge variant="secondary" className="text-xs">
-                          {link.clicks}
-                        </Badge>
-                        <ExternalLink className="w-4 h-4 opacity-50" />
+                        <span className="bg-black/40 text-white text-xs rounded-full px-3 py-1 font-semibold shadow">{link.clicks}</span>
+                        <ExternalLink className="w-4 h-4 opacity-80 text-white" />
                       </div>
                     </div>
-                  </Button>
+                    <span className="absolute inset-0 opacity-0 group-hover:opacity-10 transition bg-black" />
+                  </button>
                 </motion.div>
               ))}
           </div>
@@ -352,10 +327,10 @@ export default function PublicBioPage({ params }: { params: { username: string }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.6 }}
-            className="mt-8 text-center"
+            className="mt-10 text-center"
           >
-            <Button onClick={handleShare} variant="ghost" className={`${currentTheme.text} hover:bg-white/10`}>
-              <Share2 className="w-4 h-4 mr-2" />
+            <Button onClick={handleShare} variant="ghost" className={`text-lg px-6 py-3 rounded-full font-semibold shadow-lg bg-white/30 hover:bg-white/40 text-gray-900 dark:text-white backdrop-blur border border-white/30`}>
+              <Share2 className="w-5 h-5 mr-2" />
               Share this page
             </Button>
           </motion.div>
@@ -365,9 +340,9 @@ export default function PublicBioPage({ params }: { params: { username: string }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 0.6 }}
-            className="mt-8 text-center"
+            className="mt-10 text-center"
           >
-            <p className={`text-xs ${currentTheme.text} opacity-50`}>Powered by LinkWeaver</p>
+            <p className={`text-xs text-gray-700 dark:text-white/60 opacity-80`}>Made with <span className="text-pink-500">♥</span> by LinkWeaver</p>
           </motion.div>
         </motion.div>
       </div>
