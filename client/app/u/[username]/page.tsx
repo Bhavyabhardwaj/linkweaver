@@ -97,9 +97,21 @@ export default function PublicBioPage({ params }: { params: { username: string }
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
+  // Unwrap params if it's a Promise (Next.js App Router dynamic route)
+  const [username, setUsername] = useState<string | null>(null);
   useEffect(() => {
-    loadBioData()
-  }, [params.username])
+    (async () => {
+      let uname = params.username;
+      if (typeof uname?.then === 'function') {
+        uname = await uname;
+      }
+      setUsername(uname);
+    })();
+  }, [params.username]);
+
+  useEffect(() => {
+    if (username) loadBioData(username);
+  }, [username]);
 
   const mapBackendToBioData = (data: any): BioPageData => {
     // Map backend fields to frontend expected fields
@@ -134,9 +146,9 @@ export default function PublicBioPage({ params }: { params: { username: string }
     }
   }
 
-  const loadBioData = async () => {
+  const loadBioData = async (uname: string) => {
     try {
-      const response = await apiClient.getPublicBioPage(params.username)
+      const response = await apiClient.getPublicBioPage(uname)
       const raw = response.data || response
       const mapped = mapBackendToBioData(raw)
       if (!mapped.isActive) {
