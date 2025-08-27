@@ -205,6 +205,8 @@ export default function BioLinksPage() {
     avatar: "/placeholder.svg?height=80&width=80",
     username: "johndoe",
   })
+  const [totalViews, setTotalViews] = useState<number>(0);
+  const [copied, setCopied] = useState(false);
 
   const { user } = useAuth()
   const { toast } = useToast()
@@ -226,6 +228,18 @@ export default function BioLinksPage() {
   useEffect(() => {
     loadBioLinks()
   }, [])
+
+  useEffect(() => {
+    async function fetchTotalViews() {
+      try {
+        const response = await apiClient.getTotalBioLinkViews();
+        setTotalViews(response?.data?.totalViews || 0);
+      } catch (error) {
+        setTotalViews(0);
+      }
+    }
+    fetchTotalViews();
+  }, []);
 
   const loadBioLinks = async () => {
     try {
@@ -392,6 +406,13 @@ export default function BioLinksPage() {
     })
   }
 
+  const handleCopy = async () => {
+    const bioLinkUrl = `${process.env.NEXT_PUBLIC_API_URL || 'https://linkweaver.bhavya.live'}/u/${profileSettings.username}`;
+    await navigator.clipboard.writeText(bioLinkUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
   const BioPreview = () => {
     const currentTheme = themes.find((t) => t.id === selectedTheme) || themes[0]
 
@@ -546,6 +567,20 @@ export default function BioLinksPage() {
             </div>
           </div>
 
+          {/* Shareable bio link */}
+          <div className="flex items-center gap-2 mb-6">
+            <span className="font-medium">Your Bio Link:</span>
+            <Input
+              value={`${process.env.NEXT_PUBLIC_API_URL || 'https://linkweaver.bhavya.live'}/u/${profileSettings.username}`}
+              readOnly
+              className="w-[320px] text-xs bg-muted/50 cursor-pointer"
+              onClick={handleCopy}
+            />
+            <Button size="sm" variant="outline" onClick={handleCopy}>
+              {copied ? "Copied!" : "Copy Link"}
+            </Button>
+          </div>
+
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Card>
@@ -553,7 +588,7 @@ export default function BioLinksPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Total Views</p>
-                    <p className="text-2xl font-bold">5,621</p>
+                    <p className="text-2xl font-bold">{totalViews}</p>
                   </div>
                   <Eye className="w-8 h-8 text-primary" />
                 </div>
@@ -812,7 +847,7 @@ export default function BioLinksPage() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Total views</span>
-                    <span className="font-semibold">5,621</span>
+                    <span className="font-semibold">{totalViews}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Active links</span>

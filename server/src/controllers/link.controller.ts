@@ -1,3 +1,18 @@
+// Get total views for all bio links for the authenticated user
+export const getTotalBioLinkViews = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const userId = authReq.user.id;
+    const totalViews = await linkService.getTotalBioLinkViews(userId);
+    res.status(200).json({
+      status: "success",
+      message: "Total bio link views fetched successfully",
+      data: { totalViews }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 import { NotFoundError } from "../errors";
 import { linkService } from "../services";
 import { Response, NextFunction, Request } from "express";

@@ -262,6 +262,11 @@ class ApiClient {
     return result
   }
 
+  // Get total views for all bio links for the authenticated user
+  async getTotalBioLinkViews() {
+    return this.request('/api/links/bio/total-views', {}, true, 30000)
+  }
+
   // Utility method to clear cache
   private clearCacheByPattern(pattern: string) {
     for (const [key] of this.cache) {

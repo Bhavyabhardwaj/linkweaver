@@ -59,6 +59,20 @@ export const createShortLink = async (userId: string, linkData: linkValidation.S
     })
 };
 
+// Get total views for all bio links for a user
+export const getTotalBioLinkViews = async (userId: string) => {
+    const result = await prisma.link.aggregate({
+        where: {
+            userId,
+            type: LinkType.BIO
+        },
+        _sum: {
+            clickCount: true
+        }
+    });
+    return result._sum.clickCount || 0;
+};
+
 export const getBioLinks = async (userId: string) => {
     return await prisma.link.findMany({
         where: {
