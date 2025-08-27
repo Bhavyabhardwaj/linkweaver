@@ -27,7 +27,7 @@ export class EnvironmentConfig {
   static readonly GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
   // Frontend configuration
-  static readonly FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3001';
+  static readonly FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
   // Email configuration
   static readonly EMAIL_HOST = process.env.EMAIL_HOST;

@@ -30,9 +30,9 @@ const corsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     const allowedOrigins = [
       EnvironmentConfig.FRONTEND_URL,
-      'http://localhost:3001',
+      'http://localhost:3000',
       'http://localhost:5173',
-      'https://localhost:3001',
+      'https://localhost:3000',
       'https://localhost:5173'
     ].filter(Boolean); // Remove undefined values
 
