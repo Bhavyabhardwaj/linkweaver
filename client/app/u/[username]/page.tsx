@@ -101,17 +101,49 @@ export default function PublicBioPage({ params }: { params: { username: string }
     loadBioData()
   }, [params.username])
 
+  const mapBackendToBioData = (data: any): BioPageData => {
+    // Map backend fields to frontend expected fields
+    return {
+      id: data.id,
+      username: data.username,
+      displayName: data.name || data.displayName || data.username,
+      bio: data.bio || '',
+      avatar: data.image || data.avatar || '',
+      theme: data.theme || 'neon',
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      links: (data.links || []).map((link: any) => ({
+        id: link.id,
+        title: link.title,
+        url: link.url,
+        description: link.description || '',
+        icon: link.icon || '',
+        active: link.active !== undefined ? link.active : true,
+        clicks: link.clickCount || link.clicks || 0,
+      })),
+      socialLinks: data.socialLinks || {},
+      customization: data.customization || {
+        backgroundColor: '',
+        textColor: '',
+        buttonStyle: '',
+        fontFamily: '',
+      },
+      analytics: data.analytics || {
+        totalViews: data.totalViews || 0,
+        totalClicks: (data.links || []).reduce((sum: number, l: any) => sum + (l.clickCount || l.clicks || 0), 0),
+      },
+    }
+  }
+
   const loadBioData = async () => {
     try {
       const response = await apiClient.getPublicBioPage(params.username)
-      const data = response.data || response
-
-      if (!data.isActive) {
+      const raw = response.data || response
+      const mapped = mapBackendToBioData(raw)
+      if (!mapped.isActive) {
         setError("This bio page is not available")
         return
       }
-
-      setBioData(data)
+      setBioData(mapped)
     } catch (error: any) {
       console.error("Failed to load bio page:", error)
       setError("Bio page not found")
