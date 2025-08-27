@@ -149,14 +149,25 @@ export default function ShortLinksPage() {
       const response = await apiClient.getShortLinks()
       console.log('Short links response:', response)
       
-      // Handle different response formats
+      // Handle the correct response format from backend
       let linksData = []
-      if (response && response.data && Array.isArray(response.data)) {
+      if (response && response.data && response.data.shortLinks && Array.isArray(response.data.shortLinks)) {
+        linksData = response.data.shortLinks
+        console.log('Found shortLinks array with', linksData.length, 'items')
+        // Log first item to understand structure
+        if (linksData.length > 0) {
+          console.log('Sample link data:', linksData[0])
+        }
+      } else if (response && response.data && Array.isArray(response.data)) {
         linksData = response.data
+        console.log('Found direct data array with', linksData.length, 'items')
       } else if (Array.isArray(response)) {
         linksData = response
+        console.log('Response is direct array with', linksData.length, 'items')
       } else {
         console.warn('Unexpected response format:', response)
+        console.log('Response type:', typeof response)
+        console.log('Response keys:', response ? Object.keys(response) : 'null/undefined')
         linksData = []
       }
       
@@ -422,7 +433,7 @@ export default function ShortLinksPage() {
       link.slug.toLowerCase().includes(searchQuery.toLowerCase()),
   ) : []
 
-  const totalClicks = Array.isArray(links) ? links.reduce((sum, link) => sum + link.clicks, 0) : 0
+  const totalClicks = Array.isArray(links) ? links.reduce((sum, link) => sum + (link.clicks || 0), 0) : 0
   const activeLinks = Array.isArray(links) ? links.filter((link) => link.active && link.status === "active").length : 0
 
   if (loading) {
@@ -638,7 +649,7 @@ export default function ShortLinksPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Total Links</p>
-                    <p className="text-2xl font-bold">{links.length}</p>
+                    <p className="text-2xl font-bold">{Array.isArray(links) ? links.length : 0}</p>
                   </div>
                   <Calendar className="w-8 h-8 text-accent" />
                 </div>
@@ -649,7 +660,7 @@ export default function ShortLinksPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Protected</p>
-                    <p className="text-2xl font-bold">{links.filter((l) => l.hasPassword).length}</p>
+                    <p className="text-2xl font-bold">{Array.isArray(links) ? links.filter((l) => l.hasPassword).length : 0}</p>
                   </div>
                   <Shield className="w-8 h-8 text-orange-500" />
                 </div>
@@ -769,7 +780,7 @@ export default function ShortLinksPage() {
                             <div className="max-w-xs truncate text-muted-foreground">{link.url}</div>
                           </TableCell>
                           <TableCell>
-                            <div className="font-medium">{link.clicks.toLocaleString()}</div>
+                            <div className="font-medium">{(link.clicks || 0).toLocaleString()}</div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -801,7 +812,7 @@ export default function ShortLinksPage() {
                           </TableCell>
                           <TableCell>
                             <div className="text-sm text-muted-foreground">
-                              {new Date(link.createdAt).toLocaleDateString()}
+                              {link.createdAt ? new Date(link.createdAt).toLocaleDateString() : 'N/A'}
                             </div>
                           </TableCell>
                           <TableCell>

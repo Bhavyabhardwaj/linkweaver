@@ -63,8 +63,7 @@ export const getBioLinks = async (userId: string) => {
     return await prisma.link.findMany({
         where: {
             userId,
-            type: LinkType.BIO,
-            active: true
+            type: LinkType.BIO
         },
         orderBy: {
             order: 'asc'
