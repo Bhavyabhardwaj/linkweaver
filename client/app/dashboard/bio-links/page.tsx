@@ -211,6 +211,19 @@ export default function BioLinksPage() {
   const { user } = useAuth()
   const { toast } = useToast()
 
+  // Update profileSettings with real user data when loaded
+  useEffect(() => {
+    if (user) {
+      setProfileSettings((prev) => ({
+        ...prev,
+        name: user.name || prev.name,
+        username: user.username || prev.username,
+        avatar: user.avatar || prev.avatar,
+        // Optionally, set bio if you store it in user object
+      }))
+    }
+  }, [user])
+
   const form = useForm<BioLinkForm>({
     resolver: zodResolver(bioLinkSchema),
     defaultValues: {
