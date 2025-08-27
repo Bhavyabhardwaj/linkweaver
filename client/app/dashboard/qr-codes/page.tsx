@@ -37,6 +37,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import apiClient from "@/lib/api-client"
 
 const qrCodeSchema = z.object({
   url: z.string().url("Please enter a valid URL"),
@@ -87,13 +88,25 @@ export default function QRCodesPage() {
   const loadQRCodes = async () => {
     try {
       setLoading(true)
+      console.log('Loading QR codes...')
       const response = await apiClient.getQRCodes()
-      if (response.data) {
-        setQrCodes(response.data)
+      console.log('QR codes response:', response)
+      
+      // Handle different response formats
+      let qrData = []
+      if (response && response.data && Array.isArray(response.data)) {
+        qrData = response.data
+      } else if (Array.isArray(response)) {
+        qrData = response
       } else {
-        setQrCodes([])
+        console.warn('Unexpected QR response format:', response)
+        qrData = []
       }
+      
+      console.log('Setting QR codes data:', qrData)
+      setQrCodes(qrData)
     } catch (error) {
+      console.error('Failed to load QR codes:', error)
       toast({
         title: "Failed to load QR codes",
         description: "There was an error loading your QR codes.",
@@ -108,9 +121,25 @@ export default function QRCodesPage() {
   const generateQRCode = async (data: QRCodeForm) => {
     setIsGenerating(true)
     try {
-      const response = await apiClient.generateQRCode(data)
+      // Ensure all required fields are provided with proper defaults
+      const qrData = {
+        title: data.title.trim(),
+        url: data.url.trim(),
+        description: data.description?.trim() || undefined,
+        size: data.size || 300,
+        color: data.color || "#000000",
+        backgroundColor: data.backgroundColor || "#ffffff"
+      }
+
+      console.log('Generating QR code with data:', qrData)
       
+      const response = await apiClient.generateQRCode(qrData)
+      console.log('QR code generated successfully:', response)
+      
+      // Add the new QR code to the list and refresh
       setQrCodes([response, ...qrCodes])
+      await loadQRCodes() // Refresh the list
+      
       form.reset()
       setCreateDialogOpen(false)
 
@@ -119,9 +148,10 @@ export default function QRCodesPage() {
         description: "Your QR code has been created successfully.",
       })
     } catch (error) {
+      console.error('QR code generation error:', error)
       toast({
         title: "Failed to generate QR code",
-        description: "There was an error generating your QR code.",
+        description: error instanceof Error ? error.message : "There was an error generating your QR code.",
         variant: "destructive",
       })
     } finally {

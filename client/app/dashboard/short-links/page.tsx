@@ -145,13 +145,25 @@ export default function ShortLinksPage() {
 
   const loadShortLinks = async () => {
     try {
+      console.log('Loading short links...')
       const response = await apiClient.getShortLinks()
-      // Ensure response.data is an array
-      const linksData = Array.isArray(response.data) ? response.data : []
+      console.log('Short links response:', response)
+      
+      // Handle different response formats
+      let linksData = []
+      if (response && response.data && Array.isArray(response.data)) {
+        linksData = response.data
+      } else if (Array.isArray(response)) {
+        linksData = response
+      } else {
+        console.warn('Unexpected response format:', response)
+        linksData = []
+      }
+      
+      console.log('Setting links data:', linksData)
       setLinks(linksData)
     } catch (error) {
       console.error('Failed to load short links:', error)
-      // Set empty array on error to prevent filter issues
       setLinks([])
       toast({
         title: "Failed to load short links",
@@ -236,7 +248,10 @@ export default function ShortLinksPage() {
 
       console.log('Sending link data:', linkData)
 
-      await apiClient.createShortLink(linkData)
+      const result = await apiClient.createShortLink(linkData)
+      console.log('Short link created:', result)
+      
+      // Refresh the links list to show the new link
       await loadShortLinks()
 
       form.reset()
