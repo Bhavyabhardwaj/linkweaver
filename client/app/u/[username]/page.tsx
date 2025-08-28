@@ -277,13 +277,13 @@ export default function PublicBioPage({ params }: { params: { username: string }
 
       <div className={`min-h-screen ${currentTheme.background} py-10 px-4 flex flex-col items-center relative`}>
         {/* Theme Picker (show only if user is owner, here always for demo) */}
-        <div className="flex gap-2 mb-8 mt-2 flex-wrap justify-center">
+        <div className="flex gap-2 mb-10 mt-2 flex-wrap justify-center">
           {Object.entries(themes).map(([key, theme]) => (
             <button
               key={key}
-              className={`rounded-full px-4 py-1 text-xs font-semibold border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${selectedTheme === key ? 'border-pink-500 bg-gradient-to-r ' + theme.accent + ' text-white shadow-lg scale-105' : 'border-transparent bg-white/30 text-gray-700 hover:scale-105'}`}
+              className={`rounded-full px-5 py-2 text-sm font-semibold border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md backdrop-blur-lg ${selectedTheme === key ? 'border-pink-500 bg-gradient-to-r ' + theme.accent + ' text-white shadow-lg scale-110' : 'border-transparent bg-white/40 text-gray-700 hover:scale-105 hover:bg-white/60'}`}
               onClick={() => handleThemeChange(key)}
-            >
+              style={{letterSpacing: '.03em'}}>
               {theme.name}
             </button>
           ))}
@@ -303,19 +303,20 @@ export default function PublicBioPage({ params }: { params: { username: string }
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className={`${currentTheme.card} rounded-2xl p-8 mb-8 text-center shadow-2xl border border-white/30 relative overflow-hidden max-w-md mx-auto`}
-            style={{ backdropFilter: 'blur(16px)' }}
+            className={`${currentTheme.card} rounded-3xl p-10 mb-12 text-center shadow-2xl border border-white/30 relative overflow-hidden max-w-lg mx-auto flex flex-col items-center`} 
+            style={{ backdropFilter: 'blur(20px)', boxShadow: '0 8px 40px 0 rgba(80,80,120,0.18)' }}
           >
-            <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-white/40 shadow-lg">
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 bg-gradient-to-br from-white/40 to-pink-200/30 rounded-full blur-2xl opacity-40" />
+            <Avatar className="w-28 h-28 mx-auto mb-5 ring-4 ring-white/50 shadow-xl">
               <AvatarImage src={bioData.avatar || "/placeholder.svg"} alt={bioData.displayName} />
-              <AvatarFallback className="text-3xl font-bold">
+              <AvatarFallback className="text-4xl font-bold">
                 {bioData.displayName.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
-            <h1 className={`text-3xl font-extrabold mb-2 tracking-tight ${currentTheme.text}`}>{bioData.displayName}</h1>
+            <h1 className={`text-4xl font-extrabold mb-2 tracking-tight ${currentTheme.text} font-sans`} style={{letterSpacing: '.01em'}}>{bioData.displayName}</h1>
 
-            <p className={`${currentTheme.text} opacity-80 mb-4 leading-relaxed text-base`}>{bioData.bio}</p>
+            <p className={`${currentTheme.text} opacity-80 mb-6 leading-relaxed text-lg font-medium max-w-xs mx-auto`} style={{letterSpacing: '.01em'}}>{bioData.bio}</p>
 
             {/* Social Links */}
             {Object.keys(bioData.socialLinks).length > 0 && (
@@ -328,7 +329,7 @@ export default function PublicBioPage({ params }: { params: { username: string }
                       key={platform}
                       variant="ghost"
                       size="sm"
-                      className={`w-10 h-10 p-0 rounded-full ${currentTheme.text} hover:bg-white/20 border border-white/30 shadow-md bg-white/10`}
+                      className={`w-11 h-11 p-0 rounded-full ${currentTheme.text} hover:bg-white/30 border border-white/40 shadow-md bg-white/20 transition-all duration-200`}
                       onClick={() => window.open(url, "_blank")}
                     >
                       <Icon className="w-5 h-5" />
@@ -339,12 +340,12 @@ export default function PublicBioPage({ params }: { params: { username: string }
             )}
 
             {/* Stats */}
-            <div className="flex justify-center gap-8 text-base mt-4">
-              <div className={`${currentTheme.text} opacity-80 flex items-center gap-2`}>
+            <div className="flex justify-center gap-10 text-lg mt-6">
+              <div className={`${currentTheme.text} opacity-90 flex items-center gap-2 font-semibold`}>
                 <Eye className="w-5 h-5" />
                 <span>{bioData.analytics.totalViews.toLocaleString()} views</span>
               </div>
-              <div className={`${currentTheme.text} opacity-80 flex items-center gap-2`}>
+              <div className={`${currentTheme.text} opacity-90 flex items-center gap-2 font-semibold`}>
                 <ExternalLink className="w-5 h-5" />
                 <span>{bioData.analytics.totalClicks.toLocaleString()} clicks</span>
               </div>
@@ -352,7 +353,7 @@ export default function PublicBioPage({ params }: { params: { username: string }
           </motion.div>
 
           {/* Links Section */}
-          <div className="space-y-5 w-full max-w-md mx-auto">
+          <div className="space-y-6 w-full max-w-md mx-auto">
             {bioData.links
               .filter((link) => link.active)
               .map((link, index) => (
@@ -364,13 +365,13 @@ export default function PublicBioPage({ params }: { params: { username: string }
                 >
                   <button
                     onClick={() => handleLinkClick(link)}
-                    className={`w-full h-auto p-0 group rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] ${currentTheme.button} relative overflow-hidden border border-white/30 backdrop-blur-xl`}
-                    style={{ minHeight: 60 }}
+                    className={`w-full h-auto p-0 group rounded-2xl shadow-2xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.04] ${currentTheme.button} relative overflow-hidden border border-white/30 backdrop-blur-xl flex items-center`} 
+                    style={{ minHeight: 64, fontWeight: 600, fontSize: '1.15rem', letterSpacing: '.01em' }}
                   >
-                    <div className="flex items-center gap-4 w-full px-6 py-4">
+                    <div className="flex items-center gap-4 w-full px-7 py-4">
                       {link.icon && <div className="text-2xl flex-shrink-0">{link.icon}</div>}
                       <div className="flex-1 text-left">
-                        <div className="font-semibold text-lg mb-1 text-white drop-shadow-lg">{link.title}</div>
+                        <div className="mb-1 text-white drop-shadow-lg">{link.title}</div>
                         {link.description && <div className="text-sm text-white/80">{link.description}</div>}
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
