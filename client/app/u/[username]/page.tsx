@@ -3,16 +3,11 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { 
-  ExternalLink, Share2, Eye, Globe, Instagram, Twitter, 
-  Youtube, Github, Linkedin, Star, Verified, MapPin,
-  Clock, TrendingUp, Users, Heart, MessageCircle, 
-  Calendar, Mail, Phone, Link as LinkIcon, Sparkles
+  ExternalLink, Share2, Instagram, Twitter, 
+  Youtube, Github, Linkedin, Globe, Mail, Phone
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import apiClient from "@/lib/api-client"
 import Head from "next/head"
@@ -25,19 +20,12 @@ interface BioPageData {
   avatar?: string
   theme: string
   isActive: boolean
-  verified?: boolean
-  location?: string
-  website?: string
   links: Array<{
     id: string
     title: string
     url: string
-    description?: string
-    icon?: string
     active: boolean
     clicks: number
-    featured?: boolean
-    category?: string
   }>
   socialLinks: {
     instagram?: string
@@ -49,70 +37,36 @@ interface BioPageData {
     email?: string
     phone?: string
   }
-  customization: {
-    backgroundColor: string
-    textColor: string
-    buttonStyle: string
-    fontFamily: string
-  }
   analytics: {
     totalViews: number
     totalClicks: number
-    followers?: number
-    engagement?: number
   }
 }
 
 const themes = {
+  light: {
+    name: "Light",
+    background: "bg-white",
+    text: "text-gray-900",
+    subtext: "text-gray-600",
+    button: "bg-gray-900 hover:bg-gray-700 text-white border border-gray-900",
+    socialButton: "bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-200",
+  },
+  dark: {
+    name: "Dark", 
+    background: "bg-gray-900",
+    text: "text-white",
+    subtext: "text-gray-300",
+    button: "bg-white hover:bg-gray-100 text-gray-900 border border-white",
+    socialButton: "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700",
+  },
   gradient: {
     name: "Gradient",
     background: "bg-gradient-to-br from-purple-400 via-pink-400 to-red-400",
-    overlay: "bg-black/20",
-    card: "bg-white/95 backdrop-blur-xl border-0 shadow-2xl",
-    button: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl",
-    text: "text-gray-900",
-    accent: "text-purple-600",
-    featured: "bg-gradient-to-r from-yellow-400 to-orange-500",
-  },
-  glassmorphism: {
-    name: "Glass",
-    background: "bg-gradient-to-br from-blue-50 via-white to-purple-50",
-    overlay: "bg-gradient-to-br from-blue-500/10 to-purple-500/10",
-    card: "bg-white/40 backdrop-blur-2xl border border-white/50 shadow-2xl",
-    button: "bg-white/80 hover:bg-white/90 text-gray-900 backdrop-blur-xl border border-white/50 shadow-lg hover:shadow-xl",
-    text: "text-gray-900",
-    accent: "text-blue-600",
-    featured: "bg-gradient-to-r from-blue-400 to-purple-500",
-  },
-  neon: {
-    name: "Neon",
-    background: "bg-gray-900",
-    overlay: "bg-gradient-to-br from-cyan-500/20 to-purple-500/20",
-    card: "bg-gray-800/80 backdrop-blur-xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20",
-    button: "bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-300 hover:to-purple-400 text-white shadow-lg shadow-cyan-500/30",
     text: "text-white",
-    accent: "text-cyan-400",
-    featured: "bg-gradient-to-r from-yellow-400 to-pink-500 shadow-lg shadow-pink-500/30",
-  },
-  minimal: {
-    name: "Minimal",
-    background: "bg-white",
-    overlay: "bg-gradient-to-br from-gray-50 to-gray-100",
-    card: "bg-white border border-gray-200 shadow-xl",
-    button: "bg-gray-900 hover:bg-gray-800 text-white shadow-lg",
-    text: "text-gray-900",
-    accent: "text-gray-600",
-    featured: "bg-gray-900",
-  },
-  sunset: {
-    name: "Sunset",
-    background: "bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600",
-    overlay: "bg-black/10",
-    card: "bg-white/90 backdrop-blur-xl border-0 shadow-2xl",
-    button: "bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white shadow-lg",
-    text: "text-gray-900",
-    accent: "text-orange-600",
-    featured: "bg-gradient-to-r from-yellow-400 to-orange-500",
+    subtext: "text-white/80",
+    button: "bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30",
+    socialButton: "bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm border border-white/20",
   }
 }
 
@@ -127,23 +81,13 @@ const socialIcons = {
   phone: Phone,
 }
 
-const categoryIcons = {
-  social: Users,
-  work: LinkIcon,
-  creative: Sparkles,
-  contact: Mail,
-  default: ExternalLink
-}
-
 export default function PublicBioPage({ params }: { params: { username: string } }) {
   const [bioData, setBioData] = useState<BioPageData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedTheme, setSelectedTheme] = useState<string>('gradient')
-  const [viewCount, setViewCount] = useState(0)
+  const [selectedTheme, setSelectedTheme] = useState<string>('light')
   const { toast } = useToast()
 
-  // Unwrap params if it's a Promise (Next.js App Router dynamic route)
   const [username, setUsername] = useState<string | null>(null);
   useEffect(() => {
     (async () => {
@@ -158,13 +102,11 @@ export default function PublicBioPage({ params }: { params: { username: string }
   useEffect(() => {
     if (username) {
       loadBioData(username);
-      // Simulate view tracking
-      setViewCount(prev => prev + 1);
     }
   }, [username]);
 
   useEffect(() => {
-    if (bioData && bioData.theme && themes[bioData.theme]) {
+    if (bioData && bioData.theme && themes[bioData.theme as keyof typeof themes]) {
       setSelectedTheme(bioData.theme)
     }
   }, [bioData])
@@ -176,34 +118,19 @@ export default function PublicBioPage({ params }: { params: { username: string }
       displayName: data.name || data.displayName || data.username,
       bio: data.bio || '',
       avatar: data.image || data.avatar || '',
-      theme: data.theme || 'gradient',
+      theme: data.theme || 'light',
       isActive: data.isActive !== undefined ? data.isActive : true,
-      verified: data.verified || false,
-      location: data.location,
-      website: data.website,
-      links: (data.links || []).map((link: any, index: number) => ({
+      links: (data.links || []).map((link: any) => ({
         id: link.id,
         title: link.title,
         url: link.url,
-        description: link.description || '',
-        icon: link.icon || '',
         active: link.active !== undefined ? link.active : true,
-        clicks: link.clickCount || link.clicks || Math.floor(Math.random() * 100),
-        featured: index < 2, // First two links are featured
-        category: link.category || 'default',
+        clicks: link.clickCount || link.clicks || 0,
       })),
       socialLinks: data.socialLinks || {},
-      customization: data.customization || {
-        backgroundColor: '',
-        textColor: '',
-        buttonStyle: '',
-        fontFamily: '',
-      },
       analytics: {
-        totalViews: data.totalViews || 1247,
-        totalClicks: (data.links || []).reduce((sum: number, l: any) => sum + (l.clickCount || l.clicks || 0), 0) || 856,
-        followers: data.followers || 2341,
-        engagement: data.engagement || 89.5,
+        totalViews: data.totalViews || 0,
+        totalClicks: (data.links || []).reduce((sum: number, l: any) => sum + (l.clickCount || l.clicks || 0), 0) || 0,
       },
     }
   }
@@ -229,21 +156,9 @@ export default function PublicBioPage({ params }: { params: { username: string }
   const handleLinkClick = async (link: any) => {
     try {
       window.open(link.url, "_blank")
-      // Simulate click tracking
-      setBioData(prev => prev ? {
-        ...prev,
-        links: prev.links.map(l => 
-          l.id === link.id ? { ...l, clicks: l.clicks + 1 } : l
-        ),
-        analytics: {
-          ...prev.analytics,
-          totalClicks: prev.analytics.totalClicks + 1
-        }
-      } : null)
-      
       toast({
-        title: "Link opened!",
-        description: `Opening ${link.title}`,
+        title: "Opening link",
+        description: `Redirecting to ${link.title}`,
       })
     } catch (error) {
       console.error("Failed to track click:", error)
@@ -254,7 +169,7 @@ export default function PublicBioPage({ params }: { params: { username: string }
     try {
       if (navigator.share) {
         await navigator.share({
-          title: `${bioData?.displayName}'s LinkWeaver`,
+          title: `${bioData?.displayName}'s links`,
           text: bioData?.bio,
           url: window.location.href,
         })
@@ -262,7 +177,7 @@ export default function PublicBioPage({ params }: { params: { username: string }
         await navigator.clipboard.writeText(window.location.href)
         toast({
           title: "Link copied!",
-          description: "Bio page URL copied to clipboard",
+          description: "Profile URL copied to clipboard",
         })
       }
     } catch (error) {
@@ -272,15 +187,17 @@ export default function PublicBioPage({ params }: { params: { username: string }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-6">
-          <Skeleton className="h-32 w-32 rounded-full mx-auto" />
-          <Skeleton className="h-8 w-3/4 mx-auto" />
-          <Skeleton className="h-4 w-full" />
-          <div className="space-y-4">
-            <Skeleton className="h-16 w-full rounded-2xl" />
-            <Skeleton className="h-16 w-full rounded-2xl" />
-            <Skeleton className="h-16 w-full rounded-2xl" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-full max-w-sm mx-auto px-6 py-12">
+          <div className="animate-pulse space-y-6">
+            <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto" />
+            <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto" />
+            <div className="h-4 bg-gray-200 rounded w-full mx-auto" />
+            <div className="space-y-3">
+              <div className="h-12 bg-gray-200 rounded-full" />
+              <div className="h-12 bg-gray-200 rounded-full" />
+              <div className="h-12 bg-gray-200 rounded-full" />
+            </div>
           </div>
         </div>
       </div>
@@ -289,154 +206,89 @@ export default function PublicBioPage({ params }: { params: { username: string }
 
   if (error || !bioData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-100 to-pink-100 flex items-center justify-center p-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="w-full max-w-md text-center">
-            <CardContent className="p-8">
-              <div className="text-6xl mb-4">🔍</div>
-              <h1 className="text-2xl font-bold mb-2">Page Not Found</h1>
-              <p className="text-gray-600 mb-6">{error || "This bio page doesn't exist"}</p>
-              <Button onClick={() => window.history.back()}>
-                Go Back
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
+      <div className="min-h-screen bg-white flex items-center justify-center px-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Page not found</h1>
+          <p className="text-gray-600 mb-6">{error || "This profile doesn't exist"}</p>
+          <Button onClick={() => window.history.back()}>
+            Go back
+          </Button>
+        </div>
       </div>
     )
   }
 
-  const currentTheme = themes[selectedTheme as keyof typeof themes] || themes.gradient
-  const featuredLinks = bioData.links.filter(link => link.active && link.featured)
-  const regularLinks = bioData.links.filter(link => link.active && !link.featured)
+  const currentTheme = themes[selectedTheme as keyof typeof themes] || themes.light
+  const activeLinks = bioData.links.filter(link => link.active)
 
   return (
     <>
       <Head>
-        <title>{bioData.displayName} - LinkWeaver Bio</title>
+        <title>{bioData.displayName} - LinkWeaver</title>
         <meta name="description" content={bioData.bio} />
-        <meta property="og:title" content={`${bioData.displayName} - LinkWeaver Bio`} />
+        <meta property="og:title" content={`${bioData.displayName} - LinkWeaver`} />
         <meta property="og:description" content={bioData.bio} />
         <meta property="og:type" content="profile" />
-        <meta property="og:url" content={`${typeof window !== 'undefined' ? window.location.origin : ''}/u/${bioData.username}`} />
         {bioData.avatar && <meta property="og:image" content={bioData.avatar} />}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${bioData.displayName} - LinkWeaver Bio`} />
-        <meta name="twitter:description" content={bioData.bio} />
       </Head>
 
-      <div className={`min-h-screen ${currentTheme.background} relative`}>
-        {/* Background overlay */}
-        <div className={`absolute inset-0 ${currentTheme.overlay}`} />
-        
-        {/* Floating background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl" />
+      <div className={`min-h-screen ${currentTheme.background}`}>
+        {/* Theme selector - only show if you want users to change themes */}
+        <div className="absolute top-4 right-4 flex gap-2">
+          {Object.entries(themes).map(([key, theme]) => (
+            <button
+              key={key}
+              onClick={() => setSelectedTheme(key)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                selectedTheme === key 
+                  ? 'bg-gray-900 text-white' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {theme.name}
+            </button>
+          ))}
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 py-8 max-w-md">
-          {/* Header with theme selector */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex justify-center mb-8"
-          >
-            <div className="flex gap-2 p-2 bg-white/20 backdrop-blur-lg rounded-full">
-              {Object.entries(themes).map(([key, theme]) => (
-                <button
-                  key={key}
-                  className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                    selectedTheme === key 
-                      ? 'bg-white text-gray-900 shadow-lg scale-105' 
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  onClick={() => setSelectedTheme(key)}
-                >
-                  {theme.name}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Profile Card */}
+        <div className="max-w-sm mx-auto px-6 py-12">
+          {/* Profile Section */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`${currentTheme.card} rounded-3xl p-8 mb-8 text-center relative overflow-hidden`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
           >
-            {/* Profile Image with Status */}
-            <div className="relative mb-6">
-              <Avatar className="w-28 h-28 mx-auto ring-4 ring-white/50 shadow-xl">
-                <AvatarImage src={bioData.avatar || "/placeholder.svg"} alt={bioData.displayName} />
-                <AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-purple-500 to-pink-500 text-white">
-                  {bioData.displayName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {bioData.verified && (
-                <div className="absolute -top-1 -right-1 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                  <Verified className="w-5 h-5 text-white fill-current" />
-                </div>
-              )}
-              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-green-500 text-white text-xs rounded-full font-medium">
-                🟢 Online
-              </div>
-            </div>
+            <Avatar className="w-20 h-20 mx-auto mb-4">
+              <AvatarImage src={bioData.avatar || "/placeholder.svg"} alt={bioData.displayName} />
+              <AvatarFallback className="text-2xl font-bold bg-gray-200 text-gray-700">
+                {bioData.displayName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
 
-            {/* Name and Bio */}
-            <h1 className={`text-3xl font-bold mb-2 ${currentTheme.text}`}>
+            <h1 className={`text-xl font-bold mb-2 ${currentTheme.text}`}>
               {bioData.displayName}
             </h1>
-            
-            {bioData.location && (
-              <div className={`flex items-center justify-center gap-1 mb-3 ${currentTheme.accent}`}>
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm">{bioData.location}</span>
-              </div>
+
+            {bioData.bio && (
+              <p className={`${currentTheme.subtext} text-sm mb-4`}>
+                {bioData.bio}
+              </p>
             )}
-
-            <p className={`${currentTheme.text} text-lg mb-6 leading-relaxed opacity-90`}>
-              {bioData.bio}
-            </p>
-
-            {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${currentTheme.text}`}>
-                  {bioData.analytics.totalViews.toLocaleString()}
-                </div>
-                <div className={`text-sm ${currentTheme.accent}`}>Views</div>
-              </div>
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${currentTheme.text}`}>
-                  {bioData.analytics.followers?.toLocaleString() || '2.3K'}
-                </div>
-                <div className={`text-sm ${currentTheme.accent}`}>Followers</div>
-              </div>
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${currentTheme.text}`}>
-                  {bioData.analytics.engagement?.toFixed(1) || '89.5'}%
-                </div>
-                <div className={`text-sm ${currentTheme.accent}`}>Engagement</div>
-              </div>
-            </div>
 
             {/* Social Links */}
             {Object.keys(bioData.socialLinks).length > 0 && (
-              <div className="flex justify-center gap-3 mb-4">
+              <div className="flex justify-center gap-3 mb-6">
                 {Object.entries(bioData.socialLinks).map(([platform, url]) => {
                   if (!url) return null
                   const Icon = socialIcons[platform as keyof typeof socialIcons]
                   return (
                     <motion.button
                       key={platform}
-                      whileHover={{ scale: 1.1 }}
+                      whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${currentTheme.button} transition-all`}
                       onClick={() => window.open(url, "_blank")}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${currentTheme.socialButton}`}
                     >
-                      <Icon className="w-6 h-6" />
+                      <Icon className="w-4 h-4" />
                     </motion.button>
                   )
                 })}
@@ -444,127 +296,65 @@ export default function PublicBioPage({ params }: { params: { username: string }
             )}
           </motion.div>
 
-          {/* Featured Links */}
-          {featuredLinks.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mb-8"
-            >
-              <h2 className="text-white/90 font-semibold mb-4 px-2">✨ Featured</h2>
-              <div className="space-y-4">
-                {featuredLinks.map((link, index) => {
-                  const CategoryIcon = categoryIcons[link.category as keyof typeof categoryIcons] || ExternalLink
-                  return (
-                    <motion.button
-                      key={link.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleLinkClick(link)}
-                      className={`w-full ${currentTheme.featured} text-white p-6 rounded-2xl shadow-xl transition-all group relative overflow-hidden`}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="flex items-center gap-4 relative">
-                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                          {link.icon ? <span className="text-2xl">{link.icon}</span> : <CategoryIcon className="w-6 h-6" />}
-                        </div>
-                        <div className="flex-1 text-left">
-                          <div className="font-bold text-lg mb-1">{link.title}</div>
-                          {link.description && (
-                            <div className="text-white/80 text-sm">{link.description}</div>
-                          )}
-                        </div>
-                        <div className="text-right">
-                          <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium mb-1">
-                            {link.clicks}
-                          </div>
-                          <Star className="w-4 h-4 fill-current" />
-                        </div>
-                      </div>
-                    </motion.button>
-                  )
-                })}
-              </div>
-            </motion.div>
-          )}
+          {/* Links */}
+          <div className="space-y-4 mb-8">
+            {activeLinks.map((link, index) => (
+              <motion.button
+                key={link.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + index * 0.05 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleLinkClick(link)}
+                className={`w-full py-4 px-6 rounded-full font-medium text-center transition-all ${currentTheme.button}`}
+              >
+                {link.title}
+              </motion.button>
+            ))}
+          </div>
 
-          {/* Regular Links */}
-          {regularLinks.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="space-y-4 mb-8"
-            >
-              {regularLinks.map((link, index) => {
-                const CategoryIcon = categoryIcons[link.category as keyof typeof categoryIcons] || ExternalLink
-                return (
-                  <motion.button
-                    key={link.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.7 + index * 0.1 }}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleLinkClick(link)}
-                    className={`w-full ${currentTheme.button} p-5 rounded-2xl transition-all group relative overflow-hidden`}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="flex items-center gap-4 relative">
-                      <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                        {link.icon ? <span className="text-xl">{link.icon}</span> : <CategoryIcon className="w-5 h-5" />}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <div className="font-semibold text-base">{link.title}</div>
-                        {link.description && (
-                          <div className="text-sm opacity-80">{link.description}</div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="bg-white/20 px-2 py-1 rounded-full text-xs font-medium">
-                          {link.clicks}
-                        </span>
-                        <ExternalLink className="w-4 h-4 opacity-60" />
-                      </div>
-                    </div>
-                  </motion.button>
-                )
-              })}
+          {/* Stats (only show if there are actual clicks/views) */}
+          {(bioData.analytics.totalViews > 0 || bioData.analytics.totalClicks > 0) && (
+            <div className="flex justify-center gap-6 mb-6">
+              {bioData.analytics.totalViews > 0 && (
+                <div className="text-center">
+                  <div className={`text-lg font-bold ${currentTheme.text}`}>
+                    {bioData.analytics.totalViews.toLocaleString()}
+                  </div>
+                  <div className={`text-xs ${currentTheme.subtext}`}>views</div>
+                </div>
+              )}
+              {bioData.analytics.totalClicks > 0 && (
+                <div className="text-center">
+                  <div className={`text-lg font-bold ${currentTheme.text}`}>
+                    {bioData.analytics.totalClicks.toLocaleString()}
+                  </div>
+                  <div className={`text-xs ${currentTheme.subtext}`}>clicks</div>
+                </div>
+              )}
             </div>
           )}
 
           {/* Share Button */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            className="text-center mb-8"
-          >
+          <div className="text-center">
             <Button
               onClick={handleShare}
-              className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-lg border border-white/30 rounded-2xl px-8 py-3"
+              variant="ghost"
+              size="sm"
+              className={`${currentTheme.subtext} hover:${currentTheme.text}`}
             >
-              <Share2 className="w-5 h-5 mr-2" />
-              Share Profile
+              <Share2 className="w-4 h-4 mr-2" />
+              Share
             </Button>
-          </motion.div>
+          </div>
 
           {/* Footer */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.4 }}
-            className="text-center"
-          >
-            <p className="text-white/60 text-sm">
-              Create your own with{" "}
-              <span className="font-semibold text-white">LinkWeaver</span> ✨
+          <div className="text-center mt-8">
+            <p className={`text-xs ${currentTheme.subtext}`}>
+              Create your own with LinkWeaver
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
     </>
