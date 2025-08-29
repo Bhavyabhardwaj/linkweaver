@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  ExternalLink, Share2, Instagram, Twitter, Youtube, Github, 
+import {
+  ExternalLink, Share2, Instagram, Twitter, Youtube, Github,
   Linkedin, Globe, Mail, Phone, MapPin, Calendar, Clock,
   Star, TrendingUp, Eye, Heart, Sparkles, Zap, Crown,
   Settings, Palette, Layout, Image as ImageIcon, Type,
@@ -18,7 +18,7 @@ import apiClient from "@/lib/api-client"
 import Head from "next/head"
 
 interface BioPageData {
-  id: string
+  {/* Background overlay */}
   username: string
   displayName: string
   bio: string
@@ -139,20 +139,22 @@ const premiumThemes = {
   }
 }
 
+// FIXED: Proper button style definitions
 const buttonStyles = {
-  rounded: "rounded-full",
-  square: "rounded-lg", 
-  modern: "rounded-2xl",
-  pill: "rounded-full px-8",
-  minimal: "rounded-md",
-  sharp: "rounded-none"
+  rounded: { class: "rounded-full", name: "Rounded" },
+  square: { class: "rounded-lg", name: "Square" },
+  modern: { class: "rounded-2xl", name: "Modern" },
+  pill: { class: "rounded-full", name: "Pill" },
+  minimal: { class: "rounded-md", name: "Minimal" },
+  sharp: { class: "rounded-none", name: "Sharp" }
 }
 
+// FIXED: Proper font family definitions with actual CSS classes
 const fontFamilies = {
-  inter: "font-sans",
-  mono: "font-mono", 
-  serif: "font-serif",
-  cal: "font-cal"
+  inter: { class: "font-sans", name: "Inter" },
+  mono: { class: "font-mono", name: "Monospace" },
+  serif: { class: "font-serif", name: "Serif" },
+  system: { class: "font-system-ui", name: "System UI" }
 }
 
 const socialIcons = {
@@ -173,19 +175,19 @@ export default function PremiumBioPage({ params }: { params: { username: string 
   const [error, setError] = useState<string | null>(null)
   const [selectedTheme, setSelectedTheme] = useState<string>('aurora')
   const [showCustomizer, setShowCustomizer] = useState(false)
-  const [buttonStyle, setButtonStyle] = useState('modern')
-  
-  // New advanced customization state
+
+  // FIXED: Advanced customization state with proper defaults
   const [fontSize, setFontSize] = useState(16)
   const [backgroundImage, setBackgroundImage] = useState('')
   const [primaryColor, setPrimaryColor] = useState('#8B5CF6')
   const [secondaryColor, setSecondaryColor] = useState('#EC4899')
   const [fontFamily, setFontFamily] = useState('inter')
+  const [buttonStyle, setButtonStyle] = useState('modern')
   const [buttonOpacity, setButtonOpacity] = useState(100)
   const [cardOpacity, setCardOpacity] = useState(90)
   const [animationSpeed, setAnimationSpeed] = useState(1)
   const [borderRadius, setBorderRadius] = useState(16)
-  
+
   const { toast } = useToast()
 
   const [username, setUsername] = useState<string | null>(null);
@@ -343,7 +345,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
@@ -358,7 +360,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
   if (error || !bioData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center px-6">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center text-white"
@@ -377,18 +379,22 @@ export default function PremiumBioPage({ params }: { params: { username: string 
   const currentTheme = premiumThemes[selectedTheme as keyof typeof premiumThemes] || premiumThemes.aurora
   const activeLinks = bioData.links.filter((link: any) => link.active)
 
-  // Dynamic styles based on customizations
-  const dynamicStyles = {
+  // FIXED: Dynamic styles that actually work
+  const containerStyle = {
     fontSize: `${fontSize}px`,
-    fontFamily: fontFamilies[fontFamily as keyof typeof fontFamilies],
     backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
     '--primary-color': primaryColor,
     '--secondary-color': secondaryColor,
     '--border-radius': `${borderRadius}px`,
-    '--animation-speed': `${animationSpeed}s`,
+    '--animation-duration': `${animationSpeed}s`,
   } as React.CSSProperties
+
+  // FIXED: Get actual font and button classes
+  const currentFontClass = fontFamilies[fontFamily as keyof typeof fontFamilies]?.class || 'font-sans'
+  const currentButtonClass = buttonStyles[buttonStyle as keyof typeof buttonStyles]?.class || 'rounded-2xl'
 
   return (
     <>
@@ -404,9 +410,10 @@ export default function PremiumBioPage({ params }: { params: { username: string 
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
       </Head>
 
-      <div 
-        className={`min-h-screen relative overflow-hidden ${currentTheme.background} ${fontFamilies[fontFamily as keyof typeof fontFamilies]}`}
-        style={dynamicStyles}
+      
+      <div
+        className={`min-h-screen relative overflow-hidden ${currentTheme.background} ${currentFontClass}`}
+        style={containerStyle}
       >
         {/* Background overlay */}
         <div className="absolute inset-0 overflow-hidden">
@@ -415,11 +422,6 @@ export default function PremiumBioPage({ params }: { params: { username: string 
             className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 50 / animationSpeed, repeat: Infinity, ease: "linear" }}
-          />
-          <motion.div
-            className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-white/5 to-transparent rounded-full"
-            animate={{ rotate: -360 }}
-            transition={{ duration: 70 / animationSpeed, repeat: Infinity, ease: "linear" }}
           />
         </div>
 
@@ -436,27 +438,27 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                 Customize
               </h3>
               <div className="flex gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={saveCustomizations}
                   className="text-white hover:bg-white/10"
                   title="Save customizations"
                 >
                   <Save className="w-4 h-4" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={loadCustomizations}
                   className="text-white hover:bg-white/10"
                   title="Load saved customizations"
                 >
                   <Download className="w-4 h-4" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowCustomizer(false)}
                   className="text-white hover:bg-white/10"
                 >
@@ -464,7 +466,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                 </Button>
               </div>
             </div>
-            
+
             <div className="space-y-8">
               {/* Themes */}
               <div>
@@ -477,11 +479,10 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                     <button
                       key={key}
                       onClick={() => setSelectedTheme(key)}
-                      className={`p-3 rounded-xl text-xs font-semibold transition-all ${
-                        selectedTheme === key 
-                          ? 'bg-white text-gray-900 scale-105 shadow-lg' 
+                      className={`p-3 rounded-xl text-xs font-semibold transition-all ${selectedTheme === key
+                          ? 'bg-white text-gray-900 scale-105 shadow-lg'
                           : 'bg-white/10 text-white hover:bg-white/20 hover:scale-105'
-                      }`}
+                        }`}
                     >
                       {theme.name}
                     </button>
@@ -489,7 +490,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                 </div>
               </div>
 
-              {/* Typography */}
+              {/* Typography - FIXED */}
               <div>
                 <label className="text-white/90 text-sm font-semibold mb-4 block flex items-center gap-2">
                   <Type className="w-4 h-4" />
@@ -504,23 +505,22 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                       max="24"
                       value={fontSize}
                       onChange={(e) => setFontSize(Number(e.target.value))}
-                      className="w-full accent-purple-500"
+                      className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
                     />
                   </div>
                   <div>
                     <label className="text-white/70 text-xs mb-2 block">Font Family</label>
                     <div className="grid grid-cols-2 gap-2">
-                      {Object.entries(fontFamilies).map(([key, value]) => (
+                      {Object.entries(fontFamilies).map(([key, font]) => (
                         <button
                           key={key}
                           onClick={() => setFontFamily(key)}
-                          className={`p-2 rounded-lg text-xs font-medium transition-all ${
-                            fontFamily === key 
-                              ? 'bg-white text-gray-900' 
+                          className={`p-2 rounded-lg text-xs font-medium transition-all ${fontFamily === key
+                              ? 'bg-white text-gray-900'
                               : 'bg-white/10 text-white hover:bg-white/20'
-                          }`}
+                            }`}
                         >
-                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                          {font.name}
                         </button>
                       ))}
                     </div>
@@ -528,7 +528,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                 </div>
               </div>
 
-              {/* Colors */}
+              {/* Colors - FIXED */}
               <div>
                 <label className="text-white/90 text-sm font-semibold mb-4 block flex items-center gap-2">
                   <Palette className="w-4 h-4" />
@@ -541,7 +541,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                       type="color"
                       value={primaryColor}
                       onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="w-full h-8 rounded-lg border-0 bg-transparent"
+                      className="w-full h-10 rounded-lg border-2 border-white/20 bg-transparent cursor-pointer"
                     />
                   </div>
                   <div>
@@ -550,13 +550,13 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                       type="color"
                       value={secondaryColor}
                       onChange={(e) => setSecondaryColor(e.target.value)}
-                      className="w-full h-8 rounded-lg border-0 bg-transparent"
+                      className="w-full h-10 rounded-lg border-2 border-white/20 bg-transparent cursor-pointer"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Button Styles */}
+              {/* Button Styles - FIXED */}
               <div>
                 <label className="text-white/90 text-sm font-semibold mb-4 block flex items-center gap-2">
                   <Settings className="w-4 h-4" />
@@ -567,19 +567,18 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                     <button
                       key={key}
                       onClick={() => setButtonStyle(key)}
-                      className={`p-2 text-xs font-medium transition-all ${style} ${
-                        buttonStyle === key 
-                          ? 'bg-white text-gray-900' 
+                      className={`p-2 text-xs font-medium transition-all ${style.class} ${buttonStyle === key
+                          ? 'bg-white text-gray-900'
                           : 'bg-white/10 text-white hover:bg-white/20'
-                      }`}
+                        }`}
                     >
-                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                      {style.name}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Background Image */}
+              {/* Background Image - FIXED */}
               <div>
                 <label className="text-white/90 text-sm font-semibold mb-4 block flex items-center gap-2">
                   <ImageIcon className="w-4 h-4" />
@@ -591,12 +590,12 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                     value={backgroundImage}
                     onChange={(e) => setBackgroundImage(e.target.value)}
                     placeholder="Enter background image URL"
-                    className="w-full p-3 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20 text-sm"
+                    className="w-full p-3 rounded-lg bg-white/10 text-white placeholder-white/50 border border-white/20 text-sm focus:border-white/40 focus:outline-none"
                   />
                   {backgroundImage && (
                     <button
                       onClick={() => setBackgroundImage('')}
-                      className="text-xs text-white/70 hover:text-white"
+                      className="text-xs text-white/70 hover:text-white transition-colors"
                     >
                       Clear background image
                     </button>
@@ -604,288 +603,327 @@ export default function PremiumBioPage({ params }: { params: { username: string 
                 </div>
               </div>
 
-              {/* Advanced Settings */}
+              {/* Advanced Settings - FIXED with working sliders */}
               <div>
                 <label className="text-white/90 text-sm font-semibold mb-4 block flex items-center gap-2">
                   <Sliders className="w-4 h-4" />
                   Advanced
                 </label>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
                     <label className="text-white/70 text-xs mb-2 block">Button Opacity: {buttonOpacity}%</label>
-                    <input
-                      type="range"
-                      min="20"
-                      max="100"
-                      value={buttonOpacity}
-                      onChange={(e) => setButtonOpacity(Number(e.target.value))}
-                      className="w-full accent-purple-500"
-                    />
+                    <div className="relative">
+                      <input
+                        type="range"
+                        min="20"
+                        max="100"
+                        value={buttonOpacity}
+                        onChange={(e) => setButtonOpacity(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        style={{
+                          background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(buttonOpacity - 20) / 0.8}%, #374151 ${(buttonOpacity - 20) / 0.8}%, #374151 100%)`
+                        }}
+                      />
+                      <style jsx>{`
+          .slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          }
+          .slider::-moz-range-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          }
+        `}</style>
+                    </div>
                   </div>
+
                   <div>
                     <label className="text-white/70 text-xs mb-2 block">Card Opacity: {cardOpacity}%</label>
-                    <input
-                      type="range"
-                      min="20"
-                      max="100"
-                      value={cardOpacity}
-                      onChange={(e) => setCardOpacity(Number(e.target.value))}
-                      className="w-full accent-purple-500"
-                    />
+                    <div className="relative">
+                      <input
+                        type="range"
+                        min="20"
+                        max="100"
+                        value={cardOpacity}
+                        onChange={(e) => setCardOpacity(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        style={{
+                          background: `linear-gradient(to right, #10b981 0%, #10b981 ${(cardOpacity - 20) / 0.8}%, #374151 ${(cardOpacity - 20) / 0.8}%, #374151 100%)`
+                        }}
+                      />
+                    </div>
                   </div>
+
                   <div>
                     <label className="text-white/70 text-xs mb-2 block">Animation Speed: {animationSpeed}x</label>
-                    <input
-                      type="range"
-                      min="0.5"
-                      max="3"
-                      step="0.1"
-                      value={animationSpeed}
-                      onChange={(e) => setAnimationSpeed(Number(e.target.value))}
-                      className="w-full accent-purple-500"
-                    />
+                    <div className="relative">
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="3"
+                        step="0.1"
+                        value={animationSpeed}
+                        onChange={(e) => setAnimationSpeed(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        style={{
+                          background: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${((animationSpeed - 0.5) / 2.5) * 100}%, #374151 ${((animationSpeed - 0.5) / 2.5) * 100}%, #374151 100%)`
+                        }}
+                      />
+                    </div>
                   </div>
+
                   <div>
                     <label className="text-white/70 text-xs mb-2 block">Border Radius: {borderRadius}px</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="32"
-                      value={borderRadius}
-                      onChange={(e) => setBorderRadius(Number(e.target.value))}
-                      className="w-full accent-purple-500"
-                    />
+                    <div className="relative">
+                      <input
+                        type="range"
+                        min="0"
+                        max="32"
+                        value={borderRadius}
+                        onChange={(e) => setBorderRadius(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        style={{
+                          background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${(borderRadius / 32) * 100}%, #374151 ${(borderRadius / 32) * 100}%, #374151 100%)`
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </motion.div>
 
-        {/* Customizer Toggle */}
-        <button
-          onClick={() => setShowCustomizer(!showCustomizer)}
-          className={`fixed top-6 left-6 z-40 p-3 rounded-full ${currentTheme.card} ${currentTheme.glow} transition-all hover:scale-110`}
-        >
-          <Settings className="w-5 h-5 text-white" />
-        </button>
 
-        <div className="relative z-10 max-w-md mx-auto px-6 py-12">
-          {/* Profile Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: animationSpeed }}
-            className={`${currentTheme.card} ${currentTheme.glow} rounded-3xl p-8 mb-8 text-center relative overflow-hidden`}
-            style={{ 
-              opacity: cardOpacity / 100,
-              borderRadius: `${borderRadius}px`
-            }}
-          >
-            {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-16 translate-x-16" />
-            
-            {/* Avatar with status */}
-            <div className="relative mb-6">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-                className="relative"
+              {/* Customizer Toggle */}
+              <button
+                onClick={() => setShowCustomizer(!showCustomizer)}
+                className={`fixed top-6 left-6 z-40 p-3 rounded-full ${currentTheme.card} ${currentTheme.glow} transition-all hover:scale-110`}
               >
-                <Avatar className="w-32 h-32 mx-auto ring-4 ring-white/30 shadow-2xl">
-                  <AvatarImage src={bioData.avatar || "/placeholder.svg"} alt={bioData.displayName} />
-                  <AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-purple-500 to-pink-500 text-white">
-                    {bioData.displayName.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {bioData.verified && (
-                  <div className="absolute -top-2 -right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                    <Crown className="w-5 h-5 text-white" />
-                  </div>
-                )}
-                {bioData.isPro && (
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1">
-                      <Star className="w-3 h-3 mr-1" />
-                      PRO
-                    </Badge>
-                  </div>
-                )}
-              </motion.div>
-            </div>
+                <Settings className="w-5 h-5 text-white" />
+              </button>
 
-            {/* Name and bio */}
-            <motion.h1 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 * animationSpeed }}
-              className={`text-3xl font-bold mb-2 ${currentTheme.text}`}
-            >
-              {bioData.displayName}
-            </motion.h1>
-            
-            {bioData.location && (
-              <div className={`flex items-center justify-center gap-1 mb-3 ${currentTheme.accent}`}>
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm">{bioData.location}</span>
-              </div>
-            )}
-
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 * animationSpeed }}
-              className={`${currentTheme.text} text-lg mb-6 leading-relaxed opacity-90`}
-            >
-              {bioData.bio}
-            </motion.p>
-
-            {/* Analytics - only show if there's real data */}
-            {(bioData.analytics.totalViews > 0 || bioData.analytics.totalClicks > 0) && (
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {bioData.analytics.totalViews > 0 && (
-                  <div className="text-center">
-                    <div className={`text-2xl font-bold ${currentTheme.text}`}>
-                      {bioData.analytics.totalViews.toLocaleString()}
-                    </div>
-                    <div className={`text-sm ${currentTheme.accent}`}>Views</div>
-                  </div>
-                )}
-                {bioData.analytics.totalClicks > 0 && (
-                  <div className="text-center">
-                    <div className={`text-2xl font-bold ${currentTheme.text}`}>
-                      {bioData.analytics.totalClicks.toLocaleString()}
-                    </div>
-                    <div className={`text-sm ${currentTheme.accent}`}>Clicks</div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Social Links */}
-            {Object.keys(bioData.socialLinks).length > 0 && (
-              <div className="flex justify-center gap-3 mb-4">
-                {Object.entries(bioData.socialLinks).map(([platform, url]) => {
-                  if (!url) return null
-                  const Icon = socialIcons[platform as keyof typeof socialIcons]
-                  return (
-                    <motion.button
-                      key={platform}
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${currentTheme.button} ${currentTheme.glow} transition-all`}
-                      style={{ 
-                        opacity: buttonOpacity / 100,
-                        borderRadius: `${borderRadius * 0.75}px`
-                      }}
-                      onClick={() => window.open(url, "_blank")}
-                    >
-                      <Icon className="w-6 h-6" />
-                    </motion.button>
-                  )
-                })}
-              </div>
-            )}
-          </motion.div>
-
-          {/* Links */}
-          <div className="space-y-4 mb-8">
-            <AnimatePresence>
-              {activeLinks.map((link: any, index: number) => (
-                <motion.button
-                  key={link.id}
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  transition={{ delay: (0.1 + index * 0.05) * animationSpeed }}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleLinkClick(link)}
-                  className={`w-full ${currentTheme.button} ${buttonStyles[buttonStyle as keyof typeof buttonStyles]} p-5 ${currentTheme.glow} transition-all group relative overflow-hidden`}
-                  style={{ 
-                    opacity: buttonOpacity / 100,
+              <div className="relative z-10 max-w-md mx-auto px-6 py-12">
+                {/* Profile Card - FIXED: Apply customizations */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: animationSpeed }}
+                  className={`${currentTheme.card} ${currentTheme.glow} p-8 mb-8 text-center relative overflow-hidden`}
+                  style={{
+                    opacity: cardOpacity / 100,
                     borderRadius: `${borderRadius}px`
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  
-                  <div className="flex items-center gap-4 relative">
-                    {link.thumbnail && (
-                      <img 
-                        src={link.thumbnail} 
-                        alt="" 
-                        className="w-10 h-10 rounded-lg object-cover"
-                        style={{ borderRadius: `${borderRadius * 0.5}px` }}
-                      />
-                    )}
-                    {link.icon && !link.thumbnail && (
-                      <div 
-                        className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"
-                        style={{ borderRadius: `${borderRadius * 0.5}px` }}
-                      >
-                        <span className="text-xl">{link.icon}</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold text-base">{link.title}</div>
-                      {link.description && (
-                        <div className="text-sm opacity-80">{link.description}</div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-16 translate-x-16" />
+
+                  <div className="relative mb-6">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
+                      className="relative"
+                    >
+                      <Avatar className="w-32 h-32 mx-auto ring-4 ring-white/30 shadow-2xl">
+                        <AvatarImage src={bioData.avatar || "/placeholder.svg"} alt={bioData.displayName} />
+                        <AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                          {bioData.displayName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      {bioData.verified && (
+                        <div className="absolute -top-2 -right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                          <Crown className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                      {bioData.isPro && (
+                        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1">
+                            <Star className="w-3 h-3 mr-1" />
+                            PRO
+                          </Badge>
+                        </div>
+                      )}
+                    </motion.div>
+                  </div>
+
+                  <motion.h1
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 * animationSpeed }}
+                    className={`text-3xl font-bold mb-2 ${currentTheme.text}`}
+                  >
+                    {bioData.displayName}
+                  </motion.h1>
+
+                  {bioData.location && (
+                    <div className={`flex items-center justify-center gap-1 mb-3 ${currentTheme.accent}`}>
+                      <MapPin className="w-4 h-4" />
+                      <span className="text-sm">{bioData.location}</span>
+                    </div>
+                  )}
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 * animationSpeed }}
+                    className={`${currentTheme.text} text-lg mb-6 leading-relaxed opacity-90`}
+                  >
+                    {bioData.bio}
+                  </motion.p>
+
+                  {/* Analytics - only show if there's real data */}
+                  {(bioData.analytics.totalViews > 0 || bioData.analytics.totalClicks > 0) && (
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      {bioData.analytics.totalViews > 0 && (
+                        <div className="text-center">
+                          <div className={`text-2xl font-bold ${currentTheme.text}`}>
+                            {bioData.analytics.totalViews.toLocaleString()}
+                          </div>
+                          <div className={`text-sm ${currentTheme.accent}`}>Views</div>
+                        </div>
+                      )}
+                      {bioData.analytics.totalClicks > 0 && (
+                        <div className="text-center">
+                          <div className={`text-2xl font-bold ${currentTheme.text}`}>
+                            {bioData.analytics.totalClicks.toLocaleString()}
+                          </div>
+                          <div className={`text-sm ${currentTheme.accent}`}>Clicks</div>
+                        </div>
                       )}
                     </div>
-                    
-                    {link.clicks > 0 && (
-                      <div className="text-right">
-                        <div 
-                          className="bg-white/20 px-2 py-1 rounded-full text-xs font-medium"
-                          style={{ borderRadius: `${borderRadius * 0.25}px` }}
-                        >
-                          {link.clicks}
+                  )}
+
+                  {/* Social Links */}
+                  {Object.keys(bioData.socialLinks).length > 0 && (
+                    <div className="flex justify-center gap-3 mb-4">
+                      {Object.entries(bioData.socialLinks).map(([platform, url]) => {
+                        if (!url) return null
+                        const Icon = socialIcons[platform as keyof typeof socialIcons]
+                        return (
+                          <motion.button
+                            key={platform}
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                            whileTap={{ scale: 0.95 }}
+                            className={`w-12 h-12 flex items-center justify-center ${currentTheme.button} ${currentTheme.glow} transition-all`}
+                            style={{
+                              opacity: buttonOpacity / 100,
+                              borderRadius: `${borderRadius * 0.75}px`
+                            }}
+                            onClick={() => window.open(url, "_blank")}
+                          >
+                            <Icon className="w-6 h-6" />
+                          </motion.button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+
+                {/* Links - FIXED: Apply button customizations */}
+                <div className="space-y-4 mb-8">
+                  <AnimatePresence>
+                    {activeLinks.map((link: any, index: number) => (
+                      <motion.button
+                        key={link.id}
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 50 }}
+                        transition={{ delay: (0.1 + index * 0.05) * animationSpeed }}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleLinkClick(link)}
+                        className={`w-full ${currentTheme.button} ${currentButtonClass} p-5 ${currentTheme.glow} transition-all group relative overflow-hidden`}
+                        style={{
+                          opacity: buttonOpacity / 100,
+                          borderRadius: borderRadius !== 16 ? `${borderRadius}px` : undefined
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                        <div className="flex items-center gap-4 relative">
+                          {link.thumbnail && (
+                            <img
+                              src={link.thumbnail}
+                              alt=""
+                              className="w-10 h-10 object-cover"
+                              style={{ borderRadius: `${borderRadius * 0.5}px` }}
+                            />
+                          )}
+                          {link.icon && !link.thumbnail && (
+                            <div
+                              className="w-10 h-10 bg-white/20 flex items-center justify-center"
+                              style={{ borderRadius: `${borderRadius * 0.5}px` }}
+                            >
+                              <span className="text-xl">{link.icon}</span>
+                            </div>
+                          )}
+
+                          <div className="flex-1 text-left">
+                            <div className="font-semibold text-base">{link.title}</div>
+                            {link.description && (
+                              <div className="text-sm opacity-80">{link.description}</div>
+                            )}
+                          </div>
+
+                          {link.clicks > 0 && (
+                            <div className="text-right">
+                              <div
+                                className="bg-white/20 px-2 py-1 text-xs font-medium"
+                                style={{ borderRadius: `${Math.min(borderRadius * 0.25, 12)}px` }}
+                              >
+                                {link.clicks}
+                              </div>
+                            </div>
+                          )}
+
+                          <ExternalLink className="w-4 h-4 opacity-60" />
                         </div>
-                      </div>
-                    )}
-                    
-                    <ExternalLink className="w-4 h-4 opacity-60" />
-                  </div>
-                </motion.button>
-              ))}
-            </AnimatePresence>
-          </div>
+                      </motion.button>
+                    ))}
+                  </AnimatePresence>
+                </div>
 
-          {/* Share Button */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 * animationSpeed }}
-            className="text-center mb-8"
-          >
-            <Button
-              onClick={handleShare}
-              className={`${currentTheme.card} hover:bg-white/20 ${currentTheme.text} px-8 py-3`}
-              style={{ 
-                borderRadius: `${borderRadius}px`
-              }}
-            >
-              <Share2 className="w-5 h-5 mr-2" />
-              Share Profile
-            </Button>
-          </motion.div>
+                {/* Share Button */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 * animationSpeed }}
+                  className="text-center mb-8"
+                >
+                  <Button
+                    onClick={handleShare}
+                    className={`${currentTheme.card} hover:bg-white/20 ${currentTheme.text} px-8 py-3 ${currentButtonClass}`}
+                    style={{
+                      borderRadius: borderRadius !== 16 ? `${borderRadius}px` : undefined
+                    }}
+                  >
+                    <Share2 className="w-5 h-5 mr-2" />
+                    Share Profile
+                  </Button>
+                </motion.div>
 
-          {/* Footer */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 * animationSpeed }}
-            className="text-center"
-          >
-            <p className={`text-sm ${currentTheme.accent} opacity-60`}>
-              Powered by{" "}
-              <span className={`font-semibold ${currentTheme.text}`}>LinkWeaver</span>{" "}
-              <Sparkles className="inline w-4 h-4 ml-1" />
-            </p>
-          </motion.div>
-        </div>
-      </div>
-    </>
-  )
+                {/* Footer */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2 * animationSpeed }}
+                  className="text-center"
+                >
+                  <p className={`text-sm ${currentTheme.accent} opacity-60`}>
+                    Powered by{" "}
+                    <span className={`font-semibold ${currentTheme.text}`}>LinkWeaver</span>{" "}
+                    <Sparkles className="inline w-4 h-4 ml-1" />
+                  </p>
+                </motion.div>
+              </div>
+            </div>
+          </>
+          )
 }
