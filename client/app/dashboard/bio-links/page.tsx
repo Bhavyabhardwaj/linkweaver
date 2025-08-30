@@ -456,7 +456,6 @@ export default function BioLinksPage() {
 
           <div className="space-y-3">
             {links
-              .filter((link) => link.active)
               .sort((a, b) => a.order - b.order)
               .map((link, index) => (
                 <motion.div
