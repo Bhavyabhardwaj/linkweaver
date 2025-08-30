@@ -405,7 +405,7 @@ export default function BioLinksPage() {
   }
 
   const openPreview = () => {
-    const previewUrl = `/${profileSettings.username}`
+    const previewUrl = `/u/${profileSettings.username}`
     window.open(previewUrl, "_blank")
   }
 
