@@ -73,10 +73,19 @@ const shortLinkSchema = z.object({
   password: z.string().optional(),
   expiresAt: z.string().optional(),
   clickLimit: z.number().optional(),
-  generateQR: z.boolean().default(false),
+  generateQR: z.boolean(),
 })
 
-type ShortLinkForm = z.infer<typeof shortLinkSchema>
+type ShortLinkForm = {
+  url: string;
+  title: string;
+  generateQR: boolean;
+  slug?: string;
+  description?: string;
+  password?: string;
+  expiresAt?: string;
+  clickLimit?: number;
+}
 
 interface ShortLink {
   id: string
@@ -125,18 +134,28 @@ export default function ShortLinksPage() {
     resolver: zodResolver(shortLinkSchema),
     defaultValues: {
       url: "",
+      title: "",
+      generateQR: false,
       slug: "",
-      title: "", // This will be required by validation
       description: "",
       password: "",
       expiresAt: "",
       clickLimit: undefined,
-      generateQR: false,
     },
   })
 
   const editForm = useForm<ShortLinkForm>({
     resolver: zodResolver(shortLinkSchema),
+    defaultValues: {
+      url: "",
+      title: "",
+      generateQR: false,
+      slug: "",
+      description: "",
+      password: "",
+      expiresAt: "",
+      clickLimit: undefined,
+    },
   })
 
   useEffect(() => {
@@ -288,7 +307,7 @@ export default function ShortLinksPage() {
 
     setIsUpdating(true)
     try {
-      await apiClient.updateShortLink(editingLink.id, data)
+      await apiClient.updateLink(editingLink.id, data)
       await loadShortLinks()
 
       setEditingLink(null)
@@ -312,7 +331,7 @@ export default function ShortLinksPage() {
       const link = links.find((l) => l.id === id)
       if (!link) return
 
-      await apiClient.updateShortLink(id, { active: !link.active })
+      await apiClient.updateLink(id, { active: !link.active })
       await loadShortLinks()
 
       toast({
@@ -332,7 +351,7 @@ export default function ShortLinksPage() {
     if (!linkToDelete) return
 
     try {
-      await apiClient.deleteShortLink(linkToDelete)
+      await apiClient.deleteLink(linkToDelete)
       await loadShortLinks()
 
       toast({
@@ -363,39 +382,39 @@ export default function ShortLinksPage() {
     try {
       await apiClient.request(`/api/links/${id}/extend-expiration`, { method: "PUT" })
       await loadShortLinks()
-
+    try {
+      // TODO: Implement extend expiration API in apiClient if needed
       toast({
-        title: "Expiration extended",
-        description: "Link expiration has been extended by 7 days.",
+        title: "Expiration extended (mock)",
+        description: "The expiration date has been extended.",
       })
+      loadShortLinks()
     } catch (error) {
       toast({
-        title: "Failed to extend expiration",
-        description: "There was an error extending the link expiration.",
+        title: "Error extending expiration",
+        description: (error as Error).message,
         variant: "destructive",
       })
     }
   }
-
-  const generateQRCode = async (id: string) => {
     try {
       const response = await apiClient.request(`/api/links/generate-qr-code/${id}`)
       setLinks(links.map((l) => (l.id === id ? { ...l, qrCodeUrl: response.qrCodeUrl } : l)))
-
+    try {
+      // TODO: Implement generate QR code API in apiClient if needed
       toast({
-        title: "QR code generated",
-        description: "QR code has been generated for your link.",
+        title: "QR Code generated (mock)",
+        description: "A QR code has been generated for your link.",
       })
+      loadShortLinks()
     } catch (error) {
       toast({
-        title: "Failed to generate QR code",
-        description: "There was an error generating the QR code.",
+        title: "Error generating QR code",
+        description: (error as Error).message,
         variant: "destructive",
       })
     }
   }
-
-  const startEdit = (link: ShortLink) => {
     setEditingLink(link)
     editForm.reset({
       title: link.title || "",
