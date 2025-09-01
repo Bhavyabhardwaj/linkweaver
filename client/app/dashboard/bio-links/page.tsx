@@ -611,7 +611,7 @@ export default function BioLinksPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Active Links</p>
-                    <p className="text-2xl font-bold">{links.filter((l) => l.active).length}</p>
+                    <p className="text-2xl font-bold">{links.length}</p>
                   </div>
                   <ExternalLink className="w-8 h-8 text-secondary" />
                 </div>
@@ -665,67 +665,69 @@ export default function BioLinksPage() {
                     </div>
                   ) : (
                     <Reorder.Group axis="y" values={links} onReorder={reorderLinks} className="space-y-3">
-                      {links.map((link) => (
-                        <Reorder.Item key={link.id} value={link}>
-                          <motion.div
-                            whileHover={{ scale: 1.02 }}
-                            whileDrag={{ scale: 1.05 }}
-                            className="p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-all duration-200 cursor-grab active:cursor-grabbing"
-                          >
-                            <div className="flex items-center gap-4">
-                              <GripVertical className="w-5 h-5 text-muted-foreground" />
-                              <div className="flex items-center gap-3 flex-1">
-                                <span className="text-2xl">{link.icon}</span>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <p className="font-medium truncate">{link.title}</p>
-                                    <Badge variant={link.active ? "default" : "secondary"} className="text-xs">
-                                      {link.active ? "Active" : "Inactive"}
-                                    </Badge>
+                      {links
+                        .sort((a, b) => a.order - b.order)
+                        .map((link) => (
+                          <Reorder.Item key={link.id} value={link}>
+                            <motion.div
+                              whileHover={{ scale: 1.02 }}
+                              whileDrag={{ scale: 1.05 }}
+                              className={`p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-all duration-200 cursor-grab active:cursor-grabbing ${!link.active ? 'opacity-60' : ''}`}
+                            >
+                              <div className="flex items-center gap-4">
+                                <GripVertical className="w-5 h-5 text-muted-foreground" />
+                                <div className="flex items-center gap-3 flex-1">
+                                  <span className="text-2xl">{link.icon}</span>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <p className="font-medium truncate">{link.title}</p>
+                                      <Badge variant={link.active ? "default" : "secondary"} className="text-xs">
+                                        {link.active ? "Active" : "Inactive"}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground truncate">{link.url}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{link.clicks} clicks</p>
                                   </div>
-                                  <p className="text-sm text-muted-foreground truncate">{link.url}</p>
-                                  <p className="text-xs text-muted-foreground mt-1">{link.clicks} clicks</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Switch checked={link.active} onCheckedChange={() => toggleLinkStatus(link.id)} />
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="sm">
+                                        <MoreHorizontal className="w-4 h-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem onClick={() => startEdit(link)}>
+                                        <Edit className="w-4 h-4 mr-2" />
+                                        Edit
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => copyToClipboard(link.url)}>
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copy URL
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => window.open(link.url, "_blank")}> 
+                                        <ExternalLink className="w-4 h-4 mr-2" />
+                                        Visit Link
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                      <DropdownMenuItem
+                                        onClick={() => {
+                                          setLinkToDelete(link.id)
+                                          setDeleteDialogOpen(true)
+                                        }}
+                                        className="text-destructive"
+                                      >
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                        Delete
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <Switch checked={link.active} onCheckedChange={() => toggleLinkStatus(link.id)} />
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                      <MoreHorizontal className="w-4 h-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => startEdit(link)}>
-                                      <Edit className="w-4 h-4 mr-2" />
-                                      Edit
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => copyToClipboard(link.url)}>
-                                      <Copy className="w-4 h-4 mr-2" />
-                                      Copy URL
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => window.open(link.url, "_blank")}>
-                                      <ExternalLink className="w-4 h-4 mr-2" />
-                                      Visit Link
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                      onClick={() => {
-                                        setLinkToDelete(link.id)
-                                        setDeleteDialogOpen(true)
-                                      }}
-                                      className="text-destructive"
-                                    >
-                                      <Trash2 className="w-4 h-4 mr-2" />
-                                      Delete
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </div>
-                          </motion.div>
-                        </Reorder.Item>
-                      ))}
+                            </motion.div>
+                          </Reorder.Item>
+                        ))}
                     </Reorder.Group>
                   )}
                 </CardContent>
@@ -863,7 +865,7 @@ export default function BioLinksPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Active links</span>
-                    <span className="font-semibold">{links.filter((l) => l.active).length}</span>
+                    <span className="font-semibold">{links.length}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Total clicks</span>
