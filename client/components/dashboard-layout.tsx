@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { CreateLinkDialog } from "@/components/create-link-dialog"
+import { CommandPalette } from "@/components/command-palette"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { useAuth } from "@/hooks/use-auth"
 import { useToast } from "@/hooks/use-toast"
@@ -49,10 +50,27 @@ const navigation = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [createLinkOpen, setCreateLinkOpen] = useState(false)
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
   const { user, signOut } = useAuth()
   const { toast } = useToast()
+
+  // Add keyboard shortcut for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setCommandPaletteOpen(true)
+      }
+      if (e.key === 'Escape') {
+        setCommandPaletteOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const handleSignOut = async () => {
     try {
@@ -221,8 +239,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Search className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search links, analytics, settings..."
-                className="pl-10 border-0 bg-muted/50 focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-ring rounded-xl"
+                className="pl-10 border-0 bg-muted/50 focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-ring rounded-xl cursor-pointer"
+                readOnly
+                onClick={() => setCommandPaletteOpen(true)}
+                onFocus={() => setCommandPaletteOpen(true)}
               />
+              <div className="absolute right-3 text-xs text-muted-foreground pointer-events-none">
+                ⌘K
+              </div>
             </div>
           </div>
 
@@ -297,6 +321,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <CreateLinkDialog 
         open={createLinkOpen} 
         onOpenChange={setCreateLinkOpen}
+      />
+      
+      <CommandPalette 
+        open={commandPaletteOpen} 
+        onOpenChange={setCommandPaletteOpen}
       />
       </div>
     </ErrorBoundary>

@@ -109,8 +109,9 @@ class ApiClient {
   }
 
   // Bio Links
-  async getBioLinks() {
-    return this.request('/api/links/bio', {}, true, 30000) // Cache for 30 seconds
+  async getBioLinks(includeInactive = true) {
+    const params = includeInactive ? '?includeInactive=true' : ''
+    return this.request(`/api/links/bio${params}`, {}, true, 30000) // Cache for 30 seconds
   }
 
   async createBioLink(data: any) {

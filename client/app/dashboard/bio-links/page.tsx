@@ -207,6 +207,7 @@ export default function BioLinksPage() {
   })
   const [totalViews, setTotalViews] = useState<number>(0);
   const [copied, setCopied] = useState(false);
+  const [showInactive, setShowInactive] = useState(true); // Show inactive links by default
 
   const { user } = useAuth()
   const { toast } = useToast()
@@ -271,6 +272,7 @@ export default function BioLinksPage() {
           order: link.order || 0,
           createdAt: link.createdAt,
         }))
+        
         setLinks(formattedLinks)
       } else {
         setLinks([])
@@ -646,11 +648,33 @@ export default function BioLinksPage() {
             <div className="lg:col-span-2 space-y-6">
               <Card className="bg-card border-border">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <GripVertical className="w-5 h-5" />
-                    Your Links
-                  </CardTitle>
-                  <CardDescription>Drag and drop to reorder your links</CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <GripVertical className="w-5 h-5" />
+                        Your Links
+                      </CardTitle>
+                      <CardDescription>
+                        Drag and drop to reorder your links
+                        {links.length > 0 && (
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            ({links.filter(l => l.active).length} active, {links.filter(l => !l.active).length} inactive)
+                          </span>
+                        )}
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowInactive(!showInactive)}
+                        className="text-xs"
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        {showInactive ? 'Hide Inactive' : 'Show Inactive'}
+                      </Button>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {links.length === 0 ? (
@@ -666,6 +690,7 @@ export default function BioLinksPage() {
                   ) : (
                     <Reorder.Group axis="y" values={links} onReorder={reorderLinks} className="space-y-3">
                       {links
+                        .filter(link => showInactive || link.active) // Filter based on showInactive toggle
                         .sort((a, b) => a.order - b.order)
                         .map((link) => (
                           <Reorder.Item key={link.id} value={link}>

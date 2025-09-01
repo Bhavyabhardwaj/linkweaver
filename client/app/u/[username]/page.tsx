@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from "react";
 import apiClient from "@/lib/api-client";
+import { useAuth } from "@/hooks/use-auth-fixed";
 // Placeholder components for all missing icons/components (accept props)
 const Instagram = (props: any) => <></>;
 const Twitter = (props: any) => <></>;
@@ -185,6 +186,9 @@ const socialIcons = {
 };
 
 export default function PremiumBioPage({ params }: { params: { username: string } }) {
+  // Authentication hook
+  const { user, isAuthenticated } = useAuth()
+  
   // Existing state
   const [bioData, setBioData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -203,6 +207,12 @@ export default function PremiumBioPage({ params }: { params: { username: string 
   const [cardOpacity, setCardOpacity] = useState(90)
   const [animationSpeed, setAnimationSpeed] = useState(1)
   const [borderRadius, setBorderRadius] = useState(16)
+  const [particlesEnabled, setParticlesEnabled] = useState(true)
+  const [blurIntensity, setBlurIntensity] = useState(20)
+  const [glowIntensity, setGlowIntensity] = useState(25)
+  const [profileViews, setProfileViews] = useState(0)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [isScrolled, setIsScrolled] = useState(false)
 
   const [username, setUsername] = useState<string | null>(null);
   useEffect(() => {
@@ -223,6 +233,21 @@ export default function PremiumBioPage({ params }: { params: { username: string 
       setSelectedTheme(bioData.theme)
     }
   }, [bioData])
+
+  // Scroll tracking for enhanced UX
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 50
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = Math.min((window.scrollY / totalHeight) * 100, 100)
+      
+      setIsScrolled(scrolled)
+      setScrollProgress(progress)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const mapBackendToBioData = (data: any) => {
     return {
@@ -266,6 +291,30 @@ export default function PremiumBioPage({ params }: { params: { username: string 
         return
       }
       setBioData(mapped)
+      
+      // Show welcome message for profile owners
+      setTimeout(() => {
+        if (isAuthenticated && user && (user.username === mapped.username || user.username === uname)) {
+          toast({
+            title: "Welcome to your profile! 👋",
+            description: "Click the settings icon to customize your page",
+            className: "bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0"
+          })
+        }
+      }, 1500) // Delay to let page load first
+      
+      // Track profile view (only count unique views)
+      const viewKey = `profile_viewed_${uname}`
+      if (!sessionStorage.getItem(viewKey)) {
+        setProfileViews(prev => prev + 1)
+        sessionStorage.setItem(viewKey, 'true')
+        // You could also send this to your analytics API
+        try {
+          // await apiClient.trackProfileView?.(uname) // Optional future feature
+        } catch (e) {
+          // Silent fail for analytics
+        }
+      }
     } catch (error: any) {
       console.error("Failed to load bio page:", error)
       setError("Profile not found")
@@ -276,33 +325,94 @@ export default function PremiumBioPage({ params }: { params: { username: string 
 
   const handleLinkClick = async (link: any) => {
     try {
-      window.open(link.url, "_blank")
+      // Enhanced click tracking with analytics
+      const clickData = {
+        linkId: link.id,
+        timestamp: Date.now(),
+        referrer: document.referrer,
+        userAgent: navigator.userAgent
+      }
+      
+      // Haptic feedback (if supported)
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50)
+      }
+      
+      // Store click locally for immediate feedback
+      localStorage.setItem(`click_${link.id}_${Date.now()}`, JSON.stringify(clickData))
+      
+      // Show enhanced visual feedback
       toast({
-        title: "Opening link",
+        title: "🚀 Opening link",
         description: `Redirecting to ${link.title}`,
+        className: "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-xl"
       })
+      
+      // Track click analytics (non-blocking)
+      try {
+        // await apiClient.trackLinkClick?.(link.id, clickData) // Optional future feature
+      } catch (e) {
+        // Silent fail for analytics
+      }
+      
+      // Add a small delay for better UX and visual feedback
+      setTimeout(() => {
+        window.open(link.url, "_blank")
+      }, 200)
+      
     } catch (error) {
       console.error("Failed to track click:", error)
+      // Still open the link even if tracking fails
+      window.open(link.url, "_blank")
     }
+  }
+
+  // Check if current user is the profile owner
+  const isProfileOwner = () => {
+    return isAuthenticated && 
+           user && 
+           bioData && 
+           (user.username === bioData.username || user.username === params.username)
   }
 
   const handleShare = async () => {
     try {
+      const url = window.location.href
+      
       if (navigator.share) {
         await navigator.share({
           title: `${bioData?.displayName}'s links`,
           text: bioData?.bio,
-          url: window.location.href,
+          url: url,
+        })
+        
+        toast({
+          title: "Shared successfully! 🎉",
+          description: "Thanks for sharing this profile",
+          className: "bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0"
         })
       } else {
-        await navigator.clipboard.writeText(window.location.href)
+        await navigator.clipboard.writeText(url)
+        
         toast({
-          title: "Link copied!",
+          title: "Link copied! 📋",
           description: "Profile URL copied to clipboard",
+          className: "bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0"
         })
       }
+      
+      // Haptic feedback
+      if ('vibrate' in navigator) {
+        navigator.vibrate([50, 100, 50])
+      }
+      
     } catch (error) {
       console.error("Failed to share:", error)
+      toast({
+        title: "Oops! 😅",
+        description: "Couldn't share the link. Please try again.",
+        variant: "destructive"
+      })
     }
   }
 
@@ -355,16 +465,97 @@ export default function PremiumBioPage({ params }: { params: { username: string 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white/80">Loading your amazing profile...</p>
-        </motion.div>
-      </div>
+      <ThemeProvider>
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center relative overflow-hidden">
+          {/* Animated background particles */}
+          <div className="absolute inset-0">
+            {[...Array(15)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 bg-white/30 rounded-full"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                }}
+                animate={{
+                  y: [-20, 20],
+                  x: [-10, 10],
+                  opacity: [0.2, 0.8, 0.2],
+                }}
+                transition={{
+                  duration: 3 + Math.random() * 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 2,
+                }}
+              />
+            ))}
+          </div>
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center relative z-10"
+          >
+            <motion.div
+              className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center"
+              animate={{ 
+                rotate: 360,
+                boxShadow: [
+                  "0 0 20px #8B5CF6",
+                  "0 0 40px #EC4899", 
+                  "0 0 20px #8B5CF6"
+                ]
+              }}
+              transition={{ 
+                rotate: { duration: 2, repeat: Infinity, ease: "linear" },
+                boxShadow: { duration: 3, repeat: Infinity }
+              }}
+            >
+              <motion.div
+                className="w-8 h-8 border-3 border-white/50 border-t-white rounded-full"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+            </motion.div>
+            
+            <motion.h2 
+              className="text-white text-2xl font-bold mb-3"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              Loading Profile...
+            </motion.h2>
+            
+            <motion.p 
+              className="text-white/60 mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              Preparing your amazing link page
+            </motion.p>
+            
+            <div className="flex justify-center gap-2">
+              {[...Array(4)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="w-2 h-2 bg-white/60 rounded-full"
+                  animate={{ 
+                    scale: [1, 1.5, 1], 
+                    opacity: [0.3, 1, 0.3],
+                    y: [0, -10, 0]
+                  }}
+                  transition={{ 
+                    duration: 1.2, 
+                    repeat: Infinity,
+                    delay: i * 0.15 
+                  }}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </ThemeProvider>
     )
   }
 
@@ -388,7 +579,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
   }
 
   const currentTheme = premiumThemes[selectedTheme as keyof typeof premiumThemes] || premiumThemes.aurora
-  const activeLinks = bioData.links.filter((link: any) => link.active)
+  const activeLinks = bioData?.links?.filter((link: any) => link.active) || []
 
   // FIXED: Dynamic styles that actually work
   const containerStyle = {
@@ -409,26 +600,79 @@ export default function PremiumBioPage({ params }: { params: { username: string 
 return (
   <ThemeProvider>
     <>
+      {/* Scroll Progress Indicator */}
+      <motion.div
+        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 z-50"
+        style={{ width: `${scrollProgress}%` }}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.2 }}
+      />
+      
       <div
-        className={`min-h-screen relative overflow-hidden ${currentTheme.background} ${currentFontClass}`}
+        className={`min-h-screen relative overflow-hidden ${currentTheme.background} ${currentFontClass} ${
+          isProfileOwner() && showCustomizer ? 'border-l-4 border-emerald-400/50' : ''
+        }`}
         style={containerStyle}
       >
-        {/* Background overlay */}
+        {/* Enhanced Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className={`absolute inset-0 ${currentTheme.overlay}`} />
+          <div className={`absolute inset-0 ${currentTheme.overlay}`} style={{ backdropFilter: `blur(${blurIntensity}px)` }} />
+          
+          {/* Animated gradient orbs */}
           <motion.div
             className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 50 / animationSpeed, repeat: Infinity, ease: "linear" }}
           />
+          <motion.div
+            className="absolute -bottom-1/2 -right-1/2 w-3/4 h-3/4 bg-gradient-to-tl from-purple-500/10 to-transparent rounded-full"
+            animate={{ rotate: -360 }}
+            transition={{ duration: 60 / animationSpeed, repeat: Infinity, ease: "linear" }}
+          />
+          
+          {/* Floating particles */}
+          {particlesEnabled && (
+            <div className="absolute inset-0">
+              {[...Array(20)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-white/20 rounded-full"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                  }}
+                  animate={{
+                    y: [-20, 20],
+                    x: [-10, 10],
+                    opacity: [0.2, 0.8, 0.2],
+                  }}
+                  transition={{
+                    duration: 3 + Math.random() * 2,
+                    repeat: Infinity,
+                    delay: Math.random() * 2,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+          
+          {/* Glow effects */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at 50% 50%, ${primaryColor}${Math.round(glowIntensity * 2.55).toString(16).padStart(2, '0')} 0%, transparent 70%)`
+            }}
+          />
         </div>
 
-        {/* Enhanced Customization Panel */}
-        <motion.div
-          initial={{ x: -100 }}
-          animate={{ x: showCustomizer ? 0 : -400 }}
-          className="fixed top-0 left-0 h-full w-96 bg-black/90 backdrop-blur-xl border-r border-white/10 z-50 overflow-y-auto"
-        >
+        {/* Enhanced Customization Panel - Only show for profile owner */}
+        {isProfileOwner() && (
+          <motion.div
+            initial={{ x: -100 }}
+            animate={{ x: showCustomizer ? 0 : -400 }}
+            className="fixed top-0 left-0 h-full w-96 bg-black/90 backdrop-blur-xl border-r border-white/10 z-50 overflow-y-auto"
+          >
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-white font-bold text-xl flex items-center gap-2">
@@ -697,19 +941,86 @@ return (
                       />
                     </div>
                   </div>
+                  
+                  <div>
+                    <label className="text-white/70 text-xs mb-2 block">Effects</label>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/60 text-xs">Particles</span>
+                        <button
+                          onClick={() => setParticlesEnabled(!particlesEnabled)}
+                          className={`w-12 h-6 rounded-full transition-all ${particlesEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}
+                        >
+                          <div className={`w-4 h-4 bg-white rounded-full transition-transform ${particlesEnabled ? 'translate-x-7' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
+                      
+                      <div>
+                        <label className="text-white/70 text-xs mb-2 block">Blur: {blurIntensity}px</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="50"
+                          value={blurIntensity}
+                          onChange={(e) => setBlurIntensity(Number(e.target.value))}
+                          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-white/70 text-xs mb-2 block">Glow: {glowIntensity}%</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={glowIntensity}
+                          onChange={(e) => setGlowIntensity(Number(e.target.value))}
+                          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              {/* Live Preview Badge */}
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg p-3 text-white text-center">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                  <span className="text-xs font-semibold">LIVE PREVIEW</span>
+                </div>
+                <p className="text-xs opacity-80">Changes apply instantly</p>
               </div>
             </div>
           </div>
         </motion.div>
+        )}
 
-        {/* Customizer Toggle - MOVED OUTSIDE PANEL */}
-        <button
-          onClick={() => setShowCustomizer(!showCustomizer)}
-          className={`fixed top-6 left-6 z-40 p-3 rounded-full ${currentTheme.card} ${currentTheme.glow} transition-all hover:scale-110`}
-        >
-          <Settings className="w-5 h-5 text-white" />
-        </button>
+        {/* Customizer Toggle - Only show for profile owner */}
+        {isProfileOwner() && (
+          <>
+            <button
+              onClick={() => setShowCustomizer(!showCustomizer)}
+              className={`fixed top-6 left-6 z-40 p-3 rounded-full ${currentTheme.card} ${currentTheme.glow} transition-all hover:scale-110`}
+            >
+              <Settings className="w-5 h-5 text-white" />
+            </button>
+            
+            {/* Customization hint */}
+            {!showCustomizer && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 2 }}
+                className="fixed top-6 left-20 z-40 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10"
+              >
+                <p className="text-white text-xs whitespace-nowrap">
+                  👈 Click to customize your page
+                </p>
+              </motion.div>
+            )}
+          </>
+        )}
 
         <div className="relative z-10 max-w-md mx-auto px-6 py-12">
           {/* Profile Card - FIXED: Apply customizations */}
@@ -816,7 +1127,7 @@ return (
                         opacity: buttonOpacity / 100,
                         borderRadius: `${borderRadius * 0.75}px`
                       }}
-                      onClick={() => window.open(url, "_blank")}
+                      onClick={() => url && window.open(url as string, "_blank")}
                     >
                       <Icon className="w-6 h-6" />
                     </motion.button>
@@ -826,64 +1137,100 @@ return (
             )}
           </motion.div>
 
-          {/* Links - FIXED: Apply button customizations */}
+          {/* Links - Enhanced with better animations and effects */}
           <div className="space-y-4 mb-8">
             <AnimatePresence>
               {activeLinks.map((link: any, index: number) => (
                 <motion.button
                   key={link.id}
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  transition={{ delay: (0.1 + index * 0.05) * animationSpeed }}
-                  whileHover={{ scale: 1.02, y: -2 }}
+                  initial={{ opacity: 0, x: -50, scale: 0.9 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 50, scale: 0.9 }}
+                  transition={{ 
+                    delay: (0.1 + index * 0.05) * animationSpeed,
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20
+                  }}
+                  whileHover={{ 
+                    scale: 1.02, 
+                    y: -2,
+                    boxShadow: `0 20px 25px -5px ${primaryColor}40, 0 10px 10px -5px ${primaryColor}20`
+                  }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleLinkClick(link)}
-                  className={`w-full ${currentTheme.button} ${currentButtonClass} p-5 ${currentTheme.glow} transition-all group relative overflow-hidden`}
+                  className={`w-full ${currentTheme.button} ${currentButtonClass} p-5 ${currentTheme.glow} transition-all group relative overflow-hidden backdrop-blur-xl`}
                   style={{
                     opacity: buttonOpacity / 100,
-                    borderRadius: borderRadius !== 16 ? `${borderRadius}px` : undefined
+                    borderRadius: borderRadius !== 16 ? `${borderRadius}px` : undefined,
+                    boxShadow: `0 4px 15px ${primaryColor}${Math.round(glowIntensity * 0.5).toString(16).padStart(2, '0')}`
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {/* Enhanced hover gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-                  <div className="flex items-center gap-4 relative">
+                  <div className="flex items-center gap-4 relative z-10">
                     {link.thumbnail && (
-                      <img
+                      <motion.img
+                        whileHover={{ scale: 1.1, rotate: 5 }}
                         src={link.thumbnail}
                         alt=""
-                        className="w-10 h-10 object-cover"
+                        className="w-10 h-10 object-cover ring-2 ring-white/20"
                         style={{ borderRadius: `${borderRadius * 0.5}px` }}
                       />
                     )}
                     {link.icon && !link.thumbnail && (
-                      <div
-                        className="w-10 h-10 bg-white/20 flex items-center justify-center"
+                      <motion.div
+                        whileHover={{ scale: 1.1, rotate: 10 }}
+                        className="w-10 h-10 bg-white/20 flex items-center justify-center ring-2 ring-white/10"
                         style={{ borderRadius: `${borderRadius * 0.5}px` }}
                       >
                         <span className="text-xl">{link.icon}</span>
-                      </div>
+                      </motion.div>
                     )}
 
                     <div className="flex-1 text-left">
-                      <div className="font-semibold text-base">{link.title}</div>
+                      <motion.div 
+                        className="font-semibold text-base"
+                        initial={{ opacity: 0.8 }}
+                        whileHover={{ opacity: 1 }}
+                      >
+                        {link.title}
+                      </motion.div>
                       {link.description && (
-                        <div className="text-sm opacity-80">{link.description}</div>
+                        <motion.div 
+                          className="text-sm opacity-80"
+                          initial={{ opacity: 0.6 }}
+                          whileHover={{ opacity: 0.9 }}
+                        >
+                          {link.description}
+                        </motion.div>
                       )}
                     </div>
 
                     {link.clicks > 0 && (
-                      <div className="text-right">
+                      <motion.div 
+                        className="text-right"
+                        whileHover={{ scale: 1.05 }}
+                      >
                         <div
-                          className="bg-white/20 px-2 py-1 text-xs font-medium"
+                          className="bg-white/20 px-2 py-1 text-xs font-medium backdrop-blur-sm"
                           style={{ borderRadius: `${Math.min(borderRadius * 0.25, 12)}px` }}
                         >
                           {link.clicks}
                         </div>
-                      </div>
+                      </motion.div>
                     )}
 
-                    <ExternalLink className="w-4 h-4 opacity-60" />
+                    <motion.div
+                      whileHover={{ scale: 1.2, rotate: 15 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <ExternalLink className="w-4 h-4 opacity-60" />
+                    </motion.div>
                   </div>
                 </motion.button>
               ))}
@@ -909,18 +1256,136 @@ return (
             </Button>
           </motion.div>
 
-          {/* Footer */}
+          {/* Profile Ownership Indicator */}
+          {isProfileOwner() ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.1 * animationSpeed }}
+              className="text-center mb-6"
+            >
+              <div className={`inline-flex items-center gap-2 ${currentTheme.card} px-4 py-2 rounded-full border border-emerald-400/30 bg-emerald-500/10`}>
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  <Crown className="w-4 h-4 text-emerald-400" />
+                </motion.div>
+                <span className="text-emerald-300 text-sm font-medium">This is your profile</span>
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                  className="w-2 h-2 bg-emerald-400 rounded-full"
+                />
+              </div>
+            </motion.div>
+          ) : bioData && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.1 * animationSpeed }}
+              className="text-center mb-6"
+            >
+              <div className={`inline-flex items-center gap-2 ${currentTheme.card} px-3 py-1 rounded-full border border-purple-400/20 bg-purple-500/5`}>
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ repeat: Infinity, duration: 3 }}
+                >
+                  👋
+                </motion.div>
+                <span className="text-purple-300 text-xs">Visiting {bioData.displayName}'s profile</span>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Enhanced Footer */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2 * animationSpeed }}
-            className="text-center"
+            className="text-center space-y-4"
           >
-            <p className={`text-sm ${currentTheme.accent} opacity-60`}>
-              Powered by{" "}
-              <span className={`font-semibold ${currentTheme.text}`}>LinkWeaver</span>{" "}
-              <Sparkles className="inline w-4 h-4 ml-1" />
-            </p>
+            {/* Engagement Stats */}
+            <motion.div 
+              className="flex justify-center items-center space-x-6 text-sm"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 1.4 * animationSpeed }}
+            >
+              <div className={`${currentTheme.accent} opacity-70 flex items-center`}>
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ repeat: Infinity, duration: 3 }}
+                  className="mr-1"
+                >
+                  👀
+                </motion.div>
+                <span>{profileViews.toLocaleString()} views</span>
+              </div>
+              <div className={`${currentTheme.accent} opacity-70 flex items-center`}>
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="mr-1"
+                >
+                  ⚡
+                </motion.div>
+                <span>{bioData?.links?.length || 0} links</span>
+              </div>
+              <div className={`${currentTheme.accent} opacity-70 flex items-center`}>
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                  className="mr-1"
+                >
+                  🎯
+                </motion.div>
+                <span>Active profile</span>
+              </div>
+            </motion.div>
+
+            {/* Powered by section */}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="cursor-pointer"
+            >
+              <p className={`text-sm ${currentTheme.accent} opacity-60 hover:opacity-80 transition-opacity`}>
+                Crafted with{" "}
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                  className="inline-block text-red-500"
+                >
+                  💖
+                </motion.span>{" "}
+                by{" "}
+                <span className={`font-semibold ${currentTheme.text} bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent`}>
+                  LinkWeaver
+                </span>{" "}
+                <motion.span
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+                  className="inline-block"
+                >
+                  <Sparkles className="inline w-4 h-4 ml-1 text-yellow-400" />
+                </motion.span>
+              </p>
+            </motion.div>
+
+            {/* Subtle CTA */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.6 * animationSpeed }}
+              className={`text-xs ${currentTheme.accent} opacity-40 hover:opacity-60 transition-opacity cursor-pointer`}
+            >
+              <motion.p
+                whileHover={{ scale: 1.02 }}
+                className="select-none"
+              >
+                ✨ Create your own beautiful link page ✨
+              </motion.p>
+            </motion.div>
           </motion.div>
         </div>
       </div>
