@@ -13,6 +13,7 @@ import {
   Zap,
   Star,
   LinkIcon,
+  Eye,
   Play,
   CheckCircle,
   Copy,
@@ -25,7 +26,6 @@ import {
   MousePointer,
   Target,
   ChevronRight,
-  Eye,
   Clock,
   Award,
   Palette,
@@ -194,26 +194,37 @@ function Navigation() {
         </Link>
 
         <div className="hidden md:flex items-center space-x-8">
-          {["Features", "Pricing", "Docs", "Changelog"].map((item, index) => (
+          {[
+            { name: "Features", href: "#features" },
+            { name: "Demo", href: "#demo" },
+            { name: "Pricing", href: "#pricing" }
+          ].map((item, index) => (
             <motion.div
-              key={item}
+              key={item.name}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 + 0.5 }}
               whileHover={{ y: -2 }}
             >
-              <Link
-                href={`/${item.toLowerCase()}`}
-                className="relative text-gray-400 hover:text-white transition-all duration-300 text-sm font-medium group"
+              <a
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault()
+                  const element = document.querySelector(item.href)
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' })
+                  }
+                }}
+                className="relative text-gray-400 hover:text-white transition-all duration-300 text-sm font-medium group cursor-pointer"
               >
-                {item}
+                {item.name}
                 <motion.span
                   className="absolute -bottom-2 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500"
                   initial={{ width: 0 }}
                   whileHover={{ width: "100%" }}
                   transition={{ duration: 0.3 }}
                 />
-              </Link>
+              </a>
             </motion.div>
           ))}
         </div>
@@ -384,16 +395,28 @@ function HeroSection() {
             className="group"
           >
             <Button size="lg" variant="outline" asChild className="text-lg px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10 transition-all duration-500 rounded-2xl relative overflow-hidden">
-              <Link href="#demo">
+              <a 
+                href="#features"
+                onClick={(e) => {
+                  e.preventDefault()
+                  document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+              >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.6 }}
                 />
-                <Play className="mr-3 w-5 h-5 relative z-10" />
-                <span className="relative z-10">See demo</span>
-              </Link>
+                <span className="relative z-10">View Features</span>
+                <motion.div
+                  className="ml-3 relative z-10"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  <Eye className="w-5 h-5" />
+                </motion.div>
+              </a>
             </Button>
           </motion.div>
         </motion.div>
@@ -402,49 +425,76 @@ function HeroSection() {
   )
 }
 
-// MUCH MORE COMPACT Features Section
+// ENHANCED Features Section with More Details
 function FeaturesSection() {
   const features = [
     {
+      icon: <LinkIcon className="w-6 h-6" />,
+      title: "Bio Links",
+      description: "Create beautiful, customizable landing pages with all your important links in one place. Perfect for social media profiles.",
+      gradient: "from-blue-500 to-cyan-500",
+      details: ["Custom themes", "Drag & drop reordering", "Click analytics", "Mobile optimized"]
+    },
+    {
       icon: <BarChart3 className="w-6 h-6" />,
       title: "Advanced Analytics",
-      description: "Get deep insights into your link performance with real-time tracking and detailed reports.",
-      gradient: "from-blue-500 to-cyan-500",
+      description: "Comprehensive tracking with real-time insights, geographic data, device information, and referrer analytics.",
+      gradient: "from-green-500 to-emerald-500",
+      details: ["Real-time tracking", "Geographic insights", "Device analytics", "Referrer tracking"]
     },
     {
       icon: <QrCode className="w-6 h-6" />,
-      title: "Dynamic QR Codes",
-      description: "Generate beautiful QR codes that automatically update and provide detailed scan analytics.",
+      title: "QR Code Generator",
+      description: "Instantly generate QR codes for any link with customizable designs and high-resolution downloads.",
       gradient: "from-purple-500 to-pink-500",
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "Bio Link Pages",
-      description: "Create stunning, mobile-optimized landing pages that showcase all your important links.",
-      gradient: "from-green-500 to-emerald-500",
+      details: ["Custom designs", "High-res downloads", "Batch generation", "Brand colors"]
     },
     {
       icon: <Shield className="w-6 h-6" />,
       title: "Enterprise Security",
-      description: "Bank-grade security with SOC 2 compliance and advanced access controls.",
+      description: "Bank-grade security with SOC 2 compliance, advanced access controls, and enterprise-grade protection.",
       gradient: "from-red-500 to-orange-500",
+      details: ["SOC 2 compliance", "Access controls", "SSL encryption", "Fraud protection"]
     },
     {
       icon: <Globe className="w-6 h-6" />,
-      title: "Global Network",
-      description: "Lightning-fast redirects from our global CDN with intelligent routing.",
+      title: "Global CDN",
+      description: "Lightning-fast redirects from our global CDN with intelligent routing and 99.9% uptime guarantee.",
       gradient: "from-indigo-500 to-purple-500",
+      details: ["Global network", "Smart routing", "99.9% uptime", "Edge caching"]
     },
     {
       icon: <Zap className="w-6 h-6" />,
-      title: "Developer API",
-      description: "Powerful REST API with webhooks for seamless integration into your workflows.",
+      title: "URL Shortener",
+      description: "Create branded short links with custom domains, expiration dates, and password protection.",
       gradient: "from-yellow-500 to-orange-500",
+      details: ["Custom domains", "Password protection", "Expiration dates", "Bulk creation"]
     },
+    {
+      icon: <Palette className="w-6 h-6" />,
+      title: "Custom Themes",
+      description: "Personalize your bio pages with beautiful themes, custom colors, and advanced styling options.",
+      gradient: "from-pink-500 to-rose-500",
+      details: ["Pre-made themes", "Custom colors", "Font options", "Background effects"]
+    },
+    {
+      icon: <Users className="w-6 h-6" />,
+      title: "Team Collaboration",
+      description: "Collaborate with your team, share workspaces, assign roles, and manage links together efficiently.",
+      gradient: "from-teal-500 to-cyan-500",
+      details: ["Team workspaces", "Role management", "Shared analytics", "Permission controls"]
+    },
+    {
+      icon: <Code className="w-6 h-6" />,
+      title: "Developer API",
+      description: "Robust REST API for developers with comprehensive documentation and SDK support for popular frameworks.",
+      gradient: "from-violet-500 to-purple-500",
+      details: ["REST API", "SDK support", "Webhooks", "Rate limiting"]
+    }
   ]
 
   return (
-    <section className="py-20 px-6 bg-black relative overflow-hidden">
+    <section id="features" className="py-20 px-6 bg-black relative overflow-hidden">
       <BackgroundBeams />
       <GridPattern />
       
@@ -474,25 +524,25 @@ function FeaturesSection() {
           </motion.div>
           
           <TextAnimate
-            className="text-3xl md:text-4xl font-bold mb-4 text-white tracking-tight"
+            className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight"
             delay={0.2}
           >
-            Everything you need to manage links
+            Complete Link Management Platform
           </TextAnimate>
           
           <motion.p
-            className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed"
+            className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Powerful features designed to help you create, track, and optimize your links.
+            From URL shortening to bio pages, QR codes to analytics - everything you need to create, manage, and optimize your digital presence in one powerful platform.
           </motion.p>
         </motion.div>
 
-        {/* Compact 3x2 Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Enhanced 3x3 Grid for All Features */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -545,6 +595,22 @@ function FeaturesSection() {
                 >
                   {feature.description}
                 </motion.p>
+                
+                {/* Feature Details */}
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {feature.details.map((detail, idx) => (
+                    <motion.div
+                      key={idx}
+                      className="flex items-center text-xs text-gray-500"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 + idx * 0.05 }}
+                    >
+                      <div className={cn("w-1.5 h-1.5 rounded-full mr-2 bg-gradient-to-r", feature.gradient)} />
+                      {detail}
+                    </motion.div>
+                  ))}
+                </div>
                 
                 {/* Learn More Button */}
                 <div className="flex items-center justify-between">
@@ -602,6 +668,49 @@ function FeaturesSection() {
             </motion.div>
           ))}
         </div>
+        
+        {/* Call to Action */}
+        <motion.div
+          className="text-center mt-20"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button 
+              asChild
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 border-0"
+            >
+              <Link href="/auth/signup">
+                <motion.div
+                  className="flex items-center gap-2"
+                  whileHover={{ x: 2 }}
+                >
+                  Get Started for Free
+                  <motion.div
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.div>
+                </motion.div>
+              </Link>
+            </Button>
+          </motion.div>
+          
+          <motion.p
+            className="text-gray-400 text-sm mt-4"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            No credit card required • Free forever plan available
+          </motion.p>
+        </motion.div>
       </div>
     </section>
   )
@@ -811,7 +920,7 @@ function InteractiveDemoSection() {
 // Enhanced CTA Section (Same as before)
 function CTASection() {
   return (
-    <section className="py-24 px-6 bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-600 relative overflow-hidden">
+    <section id="pricing" className="py-24 px-6 bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-600 relative overflow-hidden">
       <ShootingStars />
       <BackgroundBeams />
       
