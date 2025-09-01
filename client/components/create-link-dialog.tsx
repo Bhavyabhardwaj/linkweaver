@@ -1,13 +1,52 @@
 "use client"
 
 import { useState } from "react"
-import { Link2, Users } from "lucide-react"
+import { Link2, Users, ExternalLink, Eye, Globe } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import { B              <div className="space-y-2">
+                <Label htmlFor="short-url">URL *</Label>
+                <Input 
+                  id="short-url" 
+                  placeholder="https://example.com" 
+                  {...shortForm.register("url")}
+                  onChange={(e) => {
+                    shortForm.register("url").onChange(e)
+                    validateUrl(e.target.value)
+                  }}
+                />
+                {shortForm.formState.errors.url && (
+                  <p className="text-sm text-destructive">{shortForm.formState.errors.url.message}</p>
+                )}
+                {isValidatingUrl && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <LoadingSpinner size="sm" />
+                    <span>Validating URL...</span>
+                  </div>
+                )}
+                {urlPreview && !isValidatingUrl && (
+                  <Card className="p-3 bg-muted/50">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Globe className="w-4 h-4 text-green-600" />
+                      <span className="text-green-600 font-medium">Valid URL</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="ml-auto h-auto p-1"
+                        onClick={() => window.open(urlPreview, '_blank')}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </Card>
+                )}
+              </div> from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent } from "@/components/ui/card"
+import { LoadingSpinner } from "@/components/loading"
 import { useToast } from "@/hooks/use-toast"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -40,6 +79,8 @@ interface CreateLinkDialogProps {
 export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDialogProps) {
   const [activeTab, setActiveTab] = useState("bio")
   const [isLoading, setIsLoading] = useState(false)
+  const [urlPreview, setUrlPreview] = useState<string | null>(null)
+  const [isValidatingUrl, setIsValidatingUrl] = useState(false)
   const { toast } = useToast()
 
   const bioForm = useForm<BioLinkForm>({
@@ -62,6 +103,22 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
     },
   })
 
+  // URL validation and preview
+  const validateUrl = async (url: string) => {
+    if (!url || !url.startsWith('http')) return
+
+    setIsValidatingUrl(true)
+    try {
+      // Simple URL validation
+      new URL(url)
+      setUrlPreview(url)
+    } catch (error) {
+      setUrlPreview(null)
+    } finally {
+      setIsValidatingUrl(false)
+    }
+  }
+
   const onBioSubmit = async (data: BioLinkForm) => {
     setIsLoading(true)
     try {
@@ -78,10 +135,11 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
       } else {
         window.location.reload()
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Bio link creation error:', error)
       toast({
         title: "Failed to create bio link",
-        description: "There was an error creating your bio link.",
+        description: error?.message || "There was an error creating your bio link.",
         variant: "destructive",
       })
     } finally {
@@ -105,10 +163,11 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
       } else {
         window.location.reload()
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Short link creation error:', error)
       toast({
         title: "Failed to create short link",
-        description: "There was an error creating your short link.",
+        description: error?.message || "There was an error creating your short link.",
         variant: "destructive",
       })
     } finally {
@@ -148,9 +207,40 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
 
               <div className="space-y-2">
                 <Label htmlFor="bio-url">URL *</Label>
-                <Input id="bio-url" placeholder="https://example.com" {...bioForm.register("url")} />
+                <Input 
+                  id="bio-url" 
+                  placeholder="https://example.com" 
+                  {...bioForm.register("url")}
+                  onChange={(e) => {
+                    bioForm.register("url").onChange(e)
+                    validateUrl(e.target.value)
+                  }}
+                />
                 {bioForm.formState.errors.url && (
                   <p className="text-sm text-destructive">{bioForm.formState.errors.url.message}</p>
+                )}
+                {isValidatingUrl && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <LoadingSpinner size="sm" />
+                    <span>Validating URL...</span>
+                  </div>
+                )}
+                {urlPreview && !isValidatingUrl && (
+                  <Card className="p-3 bg-muted/50">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Globe className="w-4 h-4 text-green-600" />
+                      <span className="text-green-600 font-medium">Valid URL</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="ml-auto h-auto p-1"
+                        onClick={() => window.open(urlPreview, '_blank')}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </Card>
                 )}
               </div>
 

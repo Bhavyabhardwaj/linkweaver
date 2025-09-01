@@ -169,11 +169,6 @@ export const metadata: Metadata = {
   // App configuration
   applicationName: "LinkWeaver",
   referrer: "origin-when-cross-origin",
-  colorScheme: "dark light",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" }
-  ],
   
   // PWA manifest
   manifest: "/manifest.json",
@@ -193,6 +188,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  colorScheme: "dark light",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#000000" }

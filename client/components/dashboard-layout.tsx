@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { CreateLinkDialog } from "@/components/create-link-dialog"
+import { ErrorBoundary } from "@/components/error-boundary"
 import { useAuth } from "@/hooks/use-auth"
 import { useToast } from "@/hooks/use-toast"
 
@@ -71,7 +72,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
@@ -296,6 +298,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         open={createLinkOpen} 
         onOpenChange={setCreateLinkOpen}
       />
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }
