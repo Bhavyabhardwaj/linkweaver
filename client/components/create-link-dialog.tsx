@@ -3,44 +3,7 @@
 import { useState } from "react"
 import { Link2, Users, ExternalLink, Eye, Globe } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { B              <div className="space-y-2">
-                <Label htmlFor="short-url">URL *</Label>
-                <Input 
-                  id="short-url" 
-                  placeholder="https://example.com" 
-                  {...shortForm.register("url")}
-                  onChange={(e) => {
-                    shortForm.register("url").onChange(e)
-                    validateUrl(e.target.value)
-                  }}
-                />
-                {shortForm.formState.errors.url && (
-                  <p className="text-sm text-destructive">{shortForm.formState.errors.url.message}</p>
-                )}
-                {isValidatingUrl && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <LoadingSpinner size="sm" />
-                    <span>Validating URL...</span>
-                  </div>
-                )}
-                {urlPreview && !isValidatingUrl && (
-                  <Card className="p-3 bg-muted/50">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Globe className="w-4 h-4 text-green-600" />
-                      <span className="text-green-600 font-medium">Valid URL</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="ml-auto h-auto p-1"
-                        onClick={() => window.open(urlPreview, '_blank')}
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </Card>
-                )}
-              </div> from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -51,7 +14,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 
 const bioLinkSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -263,6 +226,7 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isLoading}>
+                  {isLoading && <LoadingSpinner size="sm" className="mr-2" />}
                   {isLoading ? "Creating..." : "Create Bio Link"}
                 </Button>
               </div>
@@ -273,9 +237,40 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
             <form onSubmit={shortForm.handleSubmit(onShortSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="short-url">URL *</Label>
-                <Input id="short-url" placeholder="https://example.com/very-long-url" {...shortForm.register("url")} />
+                <Input 
+                  id="short-url" 
+                  placeholder="https://example.com/very-long-url" 
+                  {...shortForm.register("url")}
+                  onChange={(e) => {
+                    shortForm.register("url").onChange(e)
+                    validateUrl(e.target.value)
+                  }}
+                />
                 {shortForm.formState.errors.url && (
                   <p className="text-sm text-destructive">{shortForm.formState.errors.url.message}</p>
+                )}
+                {isValidatingUrl && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <LoadingSpinner size="sm" />
+                    <span>Validating URL...</span>
+                  </div>
+                )}
+                {urlPreview && !isValidatingUrl && (
+                  <Card className="p-3 bg-muted/50">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Globe className="w-4 h-4 text-green-600" />
+                      <span className="text-green-600 font-medium">Valid URL</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="ml-auto h-auto p-1"
+                        onClick={() => window.open(urlPreview, '_blank')}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </Card>
                 )}
               </div>
 
@@ -303,6 +298,7 @@ export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDi
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isLoading}>
+                  {isLoading && <LoadingSpinner size="sm" className="mr-2" />}
                   {isLoading ? "Creating..." : "Create Short Link"}
                 </Button>
               </div>

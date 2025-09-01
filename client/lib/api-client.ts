@@ -195,10 +195,11 @@ class ApiClient {
   async getAnalyticsOverview() {
     try {
       // Get bio links and their total views
-      const [bioLinks, shortLinks, totalBioViews] = await Promise.all([
+      const [bioLinks, shortLinks, totalBioViews, qrScans] = await Promise.all([
         this.getBioLinks(),
         this.getShortLinks(),
-        this.getTotalBioLinkViews()
+        this.getTotalBioLinkViews(),
+        this.getTotalQRScans()
       ]);
 
       // Calculate total clicks from all links
@@ -211,7 +212,7 @@ class ApiClient {
       return {
         totalClicks,
         totalLinks,
-        totalQRScans: 0, // TODO: Implement QR scan tracking
+        totalQRScans: qrScans.totalScans,
         totalBioViews: totalBioViews.totalViews || 0,
         recentActivity: [], // Empty for now
         topCountries: [], // Empty for now
@@ -289,6 +290,19 @@ class ApiClient {
   // Get total views for all bio links for the authenticated user
   async getTotalBioLinkViews() {
     return this.request('/api/links/bio/total-views', {}, true, 30000)
+  }
+
+  async getTotalQRScans() {
+    // Try to get QR scan analytics from the existing QR codes
+    try {
+      const qrCodes = await this.getQRCodes()
+      // Sum up scans from all QR codes if they have scan data
+      const totalScans = qrCodes.reduce((sum: number, qr: any) => sum + (qr.scans || qr.scanCount || 0), 0)
+      return { totalScans }
+    } catch (error) {
+      console.warn('Could not fetch QR scan data:', error)
+      return { totalScans: 0 }
+    }
   }
 
   // Utility method to clear cache
