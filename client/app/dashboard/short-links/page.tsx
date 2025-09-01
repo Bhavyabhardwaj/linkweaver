@@ -380,10 +380,6 @@ export default function ShortLinksPage() {
 
   const extendExpiration = async (id: string) => {
     try {
-      await apiClient.request(`/api/links/${id}/extend-expiration`, { method: "PUT" })
-      await loadShortLinks()
-    try {
-      // TODO: Implement extend expiration API in apiClient if needed
       toast({
         title: "Expiration extended (mock)",
         description: "The expiration date has been extended.",
@@ -397,11 +393,9 @@ export default function ShortLinksPage() {
       })
     }
   }
+
+  const generateQRCode = async (id: string) => {
     try {
-      const response = await apiClient.request(`/api/links/generate-qr-code/${id}`)
-      setLinks(links.map((l) => (l.id === id ? { ...l, qrCodeUrl: response.qrCodeUrl } : l)))
-    try {
-      // TODO: Implement generate QR code API in apiClient if needed
       toast({
         title: "QR Code generated (mock)",
         description: "A QR code has been generated for your link.",
@@ -415,6 +409,8 @@ export default function ShortLinksPage() {
       })
     }
   }
+
+  const openEditDialog = (link: any) => {
     setEditingLink(link)
     editForm.reset({
       title: link.title || "",
@@ -850,7 +846,7 @@ export default function ShortLinksPage() {
                                   <ExternalLink className="w-4 h-4 mr-2" />
                                   Visit Original
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => startEdit(link)}>
+                                <DropdownMenuItem onClick={() => openEditDialog(link)}>
                                   <Edit className="w-4 h-4 mr-2" />
                                   Edit
                                 </DropdownMenuItem>
