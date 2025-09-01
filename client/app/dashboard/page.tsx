@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import {
   BarChart3,
@@ -22,6 +21,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from "@/components/ui/skeleton"
 import DashboardLayout from "@/components/dashboard-layout"
 import { ProtectedRoute } from "@/components/protected-route"
+import { CreateLinkDialog } from "@/components/create-link-dialog"
 import { useAuth } from "@/hooks/use-auth"
 import { useToast } from "@/hooks/use-toast"
 import apiClient from "@/lib/api-client"
@@ -52,6 +52,7 @@ const AnimatedCounter = ({ end, duration = 2 }: { end: number; duration?: number
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [analytics, setAnalytics] = useState<any>(null)
+  const [createLinkOpen, setCreateLinkOpen] = useState(false)
   const { user } = useAuth()
   const { toast } = useToast()
 
@@ -84,8 +85,6 @@ export default function DashboardPage() {
           icon: BarChart3,
           iconColor: "text-white dark:text-black",
           iconBg: "bg-black dark:bg-white",
-          change: "+12.5%",
-          changeColor: "text-emerald-500",
         },
         {
           title: "Active Links",
@@ -93,8 +92,6 @@ export default function DashboardPage() {
           icon: Link2,
           iconColor: "text-white",
           iconBg: "bg-emerald-500",
-          change: "+8.2%",
-          changeColor: "text-emerald-500",
         },
         {
           title: "QR Scans",
@@ -102,8 +99,6 @@ export default function DashboardPage() {
           icon: QrCode,
           iconColor: "text-white",
           iconBg: "bg-orange-500",
-          change: "+23.1%",
-          changeColor: "text-emerald-500",
         },
         {
           title: "Bio Views",
@@ -111,8 +106,6 @@ export default function DashboardPage() {
           icon: Users,
           iconColor: "text-white",
           iconBg: "bg-purple-500",
-          change: "+15.7%",
-          changeColor: "text-emerald-500",
         },
       ]
     : []
@@ -162,7 +155,10 @@ export default function DashboardPage() {
               </div>
               <p className="text-muted-foreground">Here's what's happening with your links today.</p>
             </div>
-            <Button className="bg-black hover:bg-black/90 dark:bg-white dark:hover:bg-white/90 dark:text-black text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl group">
+            <Button 
+              className="bg-black hover:bg-black/90 dark:bg-white dark:hover:bg-white/90 dark:text-black text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl group"
+              onClick={() => setCreateLinkOpen(true)}
+            >
               <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-200" />
               Create Link
             </Button>
@@ -181,10 +177,6 @@ export default function DashboardPage() {
                       className={`p-3 rounded-xl ${stat.iconBg} shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110`}
                     >
                       <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
-                    </div>
-                    <div className={`flex items-center gap-1 text-sm font-medium ${stat.changeColor}`}>
-                      <ArrowUpRight className="w-3 h-3" />
-                      {stat.change}
                     </div>
                   </div>
                   <div>
@@ -373,6 +365,12 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        <CreateLinkDialog 
+          open={createLinkOpen} 
+          onOpenChange={setCreateLinkOpen}
+          onSuccess={loadAnalytics}
+        />
       </DashboardLayout>
     </ProtectedRoute>
   )

@@ -34,9 +34,10 @@ type ShortLinkForm = z.infer<typeof shortLinkSchema>
 interface CreateLinkDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess?: () => void // Add callback for when link is created successfully
 }
 
-export function CreateLinkDialog({ open, onOpenChange }: CreateLinkDialogProps) {
+export function CreateLinkDialog({ open, onOpenChange, onSuccess }: CreateLinkDialogProps) {
   const [activeTab, setActiveTab] = useState("bio")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
@@ -71,8 +72,12 @@ export function CreateLinkDialog({ open, onOpenChange }: CreateLinkDialogProps) 
       })
       bioForm.reset()
       onOpenChange(false)
-      // Refresh the page or update the state
-      window.location.reload()
+      // Call the success callback if provided, otherwise refresh the page
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        window.location.reload()
+      }
     } catch (error) {
       toast({
         title: "Failed to create bio link",
@@ -94,8 +99,12 @@ export function CreateLinkDialog({ open, onOpenChange }: CreateLinkDialogProps) 
       })
       shortForm.reset()
       onOpenChange(false)
-      // Refresh the page or update the state
-      window.location.reload()
+      // Call the success callback if provided, otherwise refresh the page
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        window.location.reload()
+      }
     } catch (error) {
       toast({
         title: "Failed to create short link",

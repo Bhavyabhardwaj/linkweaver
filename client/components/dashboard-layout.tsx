@@ -32,6 +32,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { CreateLinkDialog } from "@/components/create-link-dialog"
 import { useAuth } from "@/hooks/use-auth"
 import { useToast } from "@/hooks/use-toast"
 
@@ -46,6 +47,7 @@ const navigation = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [createLinkOpen, setCreateLinkOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
   const { user, signOut } = useAuth()
@@ -168,7 +170,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="w-full justify-start p-3 h-auto rounded-xl">
                   <Avatar className="w-8 h-8 mr-3 ring-2 ring-border">
-                    <AvatarImage src={user?.avatar || user?.profileImage} alt={user?.name || "User"} />
+                    <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
                     <AvatarFallback className="bg-muted text-muted-foreground">
                       <User className="w-4 h-4" />
                     </AvatarFallback>
@@ -226,6 +228,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Button
               size="sm"
               className="hidden sm:flex bg-black hover:bg-black/90 dark:bg-white dark:hover:bg-white/90 dark:text-black text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl group"
+              onClick={() => setCreateLinkOpen(true)}
             >
               <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-200" />
               Create Link
@@ -244,7 +247,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8 ring-2 ring-border">
-                    <AvatarImage src={user?.avatar || user?.profileImage} alt={user?.name || "User"} />
+                    <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
                     <AvatarFallback className="bg-muted text-muted-foreground">
                       <User className="w-4 h-4" />
                     </AvatarFallback>
@@ -288,6 +291,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="p-4 sm:p-6 lg:p-8">{children}</div>
         </main>
       </div>
+
+      <CreateLinkDialog 
+        open={createLinkOpen} 
+        onOpenChange={setCreateLinkOpen}
+      />
     </div>
   )
 }

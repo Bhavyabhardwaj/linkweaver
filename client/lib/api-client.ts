@@ -49,9 +49,9 @@ class ApiClient {
     }
 
     const token = this.getAuthToken()
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...options.headers as Record<string, string>,
     }
 
     if (token) {
@@ -191,18 +191,42 @@ class ApiClient {
     return this.request(`/api/links/${linkId}/analytics`, {}, true, 60000) // Cache for 1 minute
   }
 
-  // Dashboard Analytics Methods (temporary mock implementation)
+  // Dashboard Analytics Methods
   async getAnalyticsOverview() {
-    // For now, return mock data since backend endpoints don't exist yet
-    return {
-      totalClicks: 0,
-      totalLinks: 0,
-      totalQRScans: 0,
-      totalBioViews: 0,
-      clicksToday: 0,
-      avgClicksPerDay: 0,
-      topPerformingLink: "",
-      conversionRate: 0,
+    try {
+      // Get bio links and their total views
+      const [bioLinks, shortLinks, totalBioViews] = await Promise.all([
+        this.getBioLinks(),
+        this.getShortLinks(),
+        this.getTotalBioLinkViews()
+      ]);
+
+      // Calculate total clicks from all links
+      const totalClicks = bioLinks.reduce((sum: number, link: any) => sum + (link._count?.linkClicks || 0), 0) +
+                         shortLinks.reduce((sum: number, link: any) => sum + (link.clickCount || 0), 0);
+
+      // Calculate total active links
+      const totalLinks = bioLinks.length + shortLinks.length;
+
+      return {
+        totalClicks,
+        totalLinks,
+        totalQRScans: 0, // TODO: Implement QR scan tracking
+        totalBioViews: totalBioViews.totalViews || 0,
+        recentActivity: [], // Empty for now
+        topCountries: [], // Empty for now
+      }
+    } catch (error) {
+      console.error('Failed to load analytics overview:', error);
+      // Return zeros if there's an error
+      return {
+        totalClicks: 0,
+        totalLinks: 0,
+        totalQRScans: 0,
+        totalBioViews: 0,
+        recentActivity: [],
+        topCountries: [],
+      }
     }
   }
 

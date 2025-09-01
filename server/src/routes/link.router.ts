@@ -1,5 +1,3 @@
-// Get total views for all bio links for the authenticated user
-linkRouter.get('/bio/total-views', linkController.getTotalBioLinkViews);
 import { Router } from "express";
 import { analyticsController, linkController } from "../controllers";
 
