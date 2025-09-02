@@ -168,12 +168,10 @@ export default function ShortLinksPage() {
       const response = await apiClient.getShortLinks()
       console.log('Short links response:', response)
       
-      // Handle the correct response format from backend
       let linksData = []
       if (response && response.data && response.data.shortLinks && Array.isArray(response.data.shortLinks)) {
         linksData = response.data.shortLinks
         console.log('Found shortLinks array with', linksData.length, 'items')
-        // Log first item to understand structure
         if (linksData.length > 0) {
           console.log('Sample link data:', linksData[0])
         }
@@ -213,7 +211,6 @@ export default function ShortLinksPage() {
 
     setCheckingSlug(true)
     try {
-      // Simulate API call for demo
       await new Promise((resolve) => setTimeout(resolve, 500))
       const isAvailable = !links.some((link) => link.slug === slug)
       setSlugAvailable(isAvailable)
@@ -243,13 +240,11 @@ export default function ShortLinksPage() {
   const createShortLink = async (data: ShortLinkForm) => {
     setIsCreating(true)
     try {
-      // Prepare the link data
       const linkData: any = {
         url: data.url,
-        title: data.title, // Required field
+        title: data.title,
       }
 
-      // Only add optional fields if they have values
       if (data.slug && data.slug.trim()) {
         linkData.slug = data.slug.trim()
       }
@@ -266,7 +261,6 @@ export default function ShortLinksPage() {
         linkData.clickLimit = data.clickLimit
       }
 
-      // Handle expiration
       if (expirationPreset !== "custom" && expirationPreset !== "never") {
         const expirationDate = generateExpirationDate(expirationPreset)
         if (expirationDate) {
@@ -281,7 +275,6 @@ export default function ShortLinksPage() {
       const result = await apiClient.createShortLink(linkData)
       console.log('Short link created:', result)
       
-      // Refresh the links list to show the new link
       await loadShortLinks()
 
       form.reset()
@@ -495,7 +488,6 @@ export default function ShortLinksPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={form.handleSubmit(createShortLink)} className="space-y-6">
-                  {/* Basic Information */}
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="url" className="font-work-sans">Destination URL *</Label>
@@ -562,7 +554,6 @@ export default function ShortLinksPage() {
                     </div>
                   </div>
 
-                  {/* Security & Expiration */}
                   <div className="space-y-4 border-t pt-4">
                     <h4 className="font-medium flex items-center gap-2">
                       <Shield className="w-4 h-4" />
@@ -612,7 +603,6 @@ export default function ShortLinksPage() {
                     </div>
                   </div>
 
-                  {/* Additional Options */}
                   <div className="space-y-4 border-t pt-4">
                     <h4 className="font-medium">Additional Options</h4>
                     <div className="flex items-center space-x-2">
@@ -685,9 +675,9 @@ export default function ShortLinksPage() {
             </Card>
           </div>
 
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="relative flex-1 sm:max-w-sm">
+          {/* Search and Filters - FIXED FOR MOBILE */}
+          <div className="space-y-3">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search links..."
@@ -710,15 +700,15 @@ export default function ShortLinksPage() {
             </div>
           </div>
 
-          {/* Links Table */}
+          {/* Links Table - FIXED TABLE WRAPPER */}
           <Card>
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="font-inter">Your Short Links</CardTitle>
               <CardDescription className="font-dm-sans">Manage and track your shortened URLs with advanced features</CardDescription>
             </CardHeader>
-            <CardContent className="p-0 sm:p-6">
+            <CardContent className="p-0">
               {filteredLinks.length === 0 ? (
-                <div className="text-center py-8 sm:py-12 px-4 sm:px-0">
+                <div className="text-center py-8 sm:py-12 px-4 sm:px-6">
                   <ExternalLink className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground" />
                   <h3 className="mt-4 text-base sm:text-lg font-semibold font-work-sans">No short links yet</h3>
                   <p className="text-muted-foreground font-dm-sans text-sm">Create your first short link to get started</p>
@@ -729,10 +719,10 @@ export default function ShortLinksPage() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]">
+                  <table className="min-w-full table-auto">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="px-4 py-3 text-left w-[40px]">
                           <Checkbox
                             checked={selectedLinks.length === filteredLinks.length}
                             onCheckedChange={(checked) => {
@@ -743,20 +733,20 @@ export default function ShortLinksPage() {
                               }
                             }}
                           />
-                        </TableHead>
-                        <TableHead className="min-w-[200px]">Link</TableHead>
-                        <TableHead className="min-w-[150px] hidden sm:table-cell">Original URL</TableHead>
-                        <TableHead className="min-w-[80px]">Clicks</TableHead>
-                        <TableHead className="min-w-[100px] hidden md:table-cell">Status</TableHead>
-                        <TableHead className="min-w-[100px] hidden lg:table-cell">Security</TableHead>
-                        <TableHead className="min-w-[80px] hidden lg:table-cell">Created</TableHead>
-                        <TableHead className="w-[50px]">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                        </th>
+                        <th className="px-4 py-3 text-left min-w-[200px]">Link</th>
+                        <th className="px-4 py-3 text-left min-w-[150px] hidden md:table-cell">Original URL</th>
+                        <th className="px-4 py-3 text-left min-w-[80px]">Clicks</th>
+                        <th className="px-4 py-3 text-left min-w-[100px] hidden lg:table-cell">Status</th>
+                        <th className="px-4 py-3 text-left min-w-[100px] hidden lg:table-cell">Security</th>
+                        <th className="px-4 py-3 text-left min-w-[100px] hidden lg:table-cell">Created</th>
+                        <th className="px-4 py-3 text-left w-[60px]">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {filteredLinks.map((link) => (
-                        <TableRow key={link.id}>
-                          <TableCell>
+                        <tr key={link.id} className="border-b">
+                          <td className="px-4 py-3">
                             <Checkbox
                               checked={selectedLinks.includes(link.id)}
                               onCheckedChange={(checked) => {
@@ -767,17 +757,19 @@ export default function ShortLinksPage() {
                                 }
                               }}
                             />
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1 min-w-0">
-                              <div className="font-medium text-sm truncate">{link.title || "Untitled"}</div>
-                              <div className="text-xs text-muted-foreground font-mono flex items-center gap-2">
-                                <span className="truncate">{link.shortUrl}</span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="space-y-1">
+                              <div className="font-medium text-sm truncate max-w-[150px] sm:max-w-none">
+                                {link.title || "Untitled"}
+                              </div>
+                              <div className="text-xs text-muted-foreground font-mono flex items-center gap-1">
+                                <span className="truncate max-w-[120px] sm:max-w-none">{link.shortUrl}</span>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => copyToClipboard(`https://${link.shortUrl}`)}
-                                  className="h-6 w-6 p-0 flex-shrink-0"
+                                  className="h-4 w-4 p-0 flex-shrink-0"
                                 >
                                   <Copy className="w-3 h-3" />
                                 </Button>
@@ -785,19 +777,19 @@ export default function ShortLinksPage() {
                               {link.clickLimit && (
                                 <div className="space-y-1">
                                   <div className="flex justify-between text-xs text-muted-foreground">
-                                    <span>
-                                      {link.clicks} / {link.clickLimit} clicks
-                                    </span>
+                                    <span>{link.clicks} / {link.clickLimit}</span>
                                     <span>{Math.round(getClickProgress(link))}%</span>
                                   </div>
                                   <Progress value={getClickProgress(link)} className="h-1" />
                                 </div>
                               )}
-                              {/* Mobile-only info */}
-                              <div className="sm:hidden space-y-1">
-                                <div className="text-xs text-muted-foreground truncate">{link.url}</div>
+                              {/* Mobile-only additional info */}
+                              <div className="md:hidden space-y-1 pt-1 border-t border-border">
+                                <div className="text-xs text-muted-foreground truncate max-w-[180px]">
+                                  <strong>URL:</strong> {link.url}
+                                </div>
                                 <div className="flex flex-wrap gap-1">
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1">
                                     <Switch 
                                       checked={link.active} 
                                       onCheckedChange={() => toggleLinkStatus(link.id)}
@@ -826,22 +818,27 @@ export default function ShortLinksPage() {
                                     </Badge>
                                   )}
                                 </div>
+                                <div className="text-xs text-muted-foreground">
+                                  <strong>Created:</strong> {link.createdAt ? new Date(link.createdAt).toLocaleDateString() : 'N/A'}
+                                </div>
                               </div>
                             </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <div className="max-w-xs truncate text-muted-foreground text-sm">{link.url}</div>
-                          </TableCell>
-                          <TableCell>
+                          </td>
+                          <td className="px-4 py-3 hidden md:table-cell">
+                            <div className="max-w-[120px] lg:max-w-[200px] truncate text-muted-foreground text-sm">
+                              {link.url}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
                             <div className="font-medium text-sm">{(link.clicks || 0).toLocaleString()}</div>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
+                          </td>
+                          <td className="px-4 py-3 hidden lg:table-cell">
                             <div className="flex items-center gap-2">
                               <Switch checked={link.active} onCheckedChange={() => toggleLinkStatus(link.id)} />
                               {getStatusBadge(link)}
                             </div>
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell">
+                          </td>
+                          <td className="px-4 py-3 hidden lg:table-cell">
                             <div className="flex flex-wrap gap-1">
                               {link.hasPassword && (
                                 <Badge variant="outline" className="text-xs">
@@ -862,13 +859,13 @@ export default function ShortLinksPage() {
                                 </Badge>
                               )}
                             </div>
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell">
+                          </td>
+                          <td className="px-4 py-3 hidden lg:table-cell">
                             <div className="text-sm text-muted-foreground">
                               {link.createdAt ? new Date(link.createdAt).toLocaleDateString() : 'N/A'}
                             </div>
-                          </TableCell>
-                          <TableCell>
+                          </td>
+                          <td className="px-4 py-3">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -914,11 +911,11 @@ export default function ShortLinksPage() {
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </tbody>
+                  </table>
                 </div>
               )}
             </CardContent>

@@ -166,42 +166,45 @@ export default function SettingsPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="space-y-8">
-          {/* Header */}
+        <div className="space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-0 pb-6">
+          {/* Header - Mobile Responsive */}
           <div>
-            <h1 className="text-3xl font-bold font-inter">Settings</h1>
-            <p className="text-muted-foreground font-dm-sans">Manage your account settings and preferences</p>
+            <h1 className="text-2xl sm:text-3xl font-bold font-inter">Settings</h1>
+            <p className="text-muted-foreground font-dm-sans text-sm sm:text-base">Manage your account settings and preferences</p>
           </div>
 
-          <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="profile" className="font-work-sans">Profile</TabsTrigger>
-              <TabsTrigger value="security" className="font-work-sans">Security</TabsTrigger>
-              <TabsTrigger value="notifications" className="font-work-sans">Notifications</TabsTrigger>
-              <TabsTrigger value="appearance" className="font-work-sans">Appearance</TabsTrigger>
-              <TabsTrigger value="billing" className="font-work-sans">Billing</TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="profile" className="space-y-4 sm:space-y-6">
+            {/* Mobile-Responsive Tabs */}
+            <div className="overflow-x-auto">
+              <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 min-w-max w-full">
+                <TabsTrigger value="profile" className="font-work-sans text-xs sm:text-sm">Profile</TabsTrigger>
+                <TabsTrigger value="security" className="font-work-sans text-xs sm:text-sm">Security</TabsTrigger>
+                <TabsTrigger value="notifications" className="font-work-sans text-xs sm:text-sm">Notifications</TabsTrigger>
+                <TabsTrigger value="appearance" className="font-work-sans text-xs sm:text-sm">Appearance</TabsTrigger>
+                <TabsTrigger value="billing" className="font-work-sans text-xs sm:text-sm">Billing</TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value="profile" className="space-y-6">
+            <TabsContent value="profile" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
                     Profile Information
                   </CardTitle>
-                  <CardDescription>Update your profile information and public bio</CardDescription>
+                  <CardDescription className="text-sm">Update your profile information and public bio</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Avatar Upload */}
-                  <div className="flex items-center gap-6">
-                    <Avatar className="w-20 h-20">
+                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                  {/* Avatar Upload - Mobile Responsive */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 mx-auto sm:mx-0">
                       <AvatarImage src={user?.avatar || "/placeholder.svg"} />
-                      <AvatarFallback className="text-lg">{user?.name?.[0] || "U"}</AvatarFallback>
+                      <AvatarFallback className="text-base sm:text-lg">{user?.name?.[0] || "U"}</AvatarFallback>
                     </Avatar>
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-center sm:text-left">
                       <Label htmlFor="avatar-upload">Profile Picture</Label>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" asChild>
+                      <div className="flex flex-col sm:flex-row items-center gap-2">
+                        <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                           <label htmlFor="avatar-upload" className="cursor-pointer">
                             <Upload className="w-4 h-4 mr-2" />
                             Upload
@@ -214,7 +217,7 @@ export default function SettingsPage() {
                           className="hidden"
                           onChange={handleAvatarUpload}
                         />
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                           Remove
                         </Button>
                       </div>
@@ -224,7 +227,7 @@ export default function SettingsPage() {
 
                   <Separator />
 
-                  {/* Profile Form */}
+                  {/* Profile Form - Mobile Responsive */}
                   <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -254,7 +257,12 @@ export default function SettingsPage() {
 
                     <div className="space-y-2">
                       <Label htmlFor="bio">Bio</Label>
-                      <Textarea id="bio" placeholder="Tell us about yourself..." {...profileForm.register("bio")} />
+                      <Textarea 
+                        id="bio" 
+                        placeholder="Tell us about yourself..." 
+                        {...profileForm.register("bio")}
+                        className="resize-none" 
+                      />
                       <p className="text-xs text-muted-foreground">
                         {profileForm.watch("bio")?.length || 0}/160 characters
                       </p>
@@ -268,8 +276,8 @@ export default function SettingsPage() {
                       )}
                     </div>
 
-                    <div className="flex justify-end">
-                      <Button type="submit" disabled={isLoading}>
+                    <div className="flex justify-end pt-4">
+                      <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                         <Save className="w-4 h-4 mr-2" />
                         {isLoading ? "Saving..." : "Save Changes"}
                       </Button>
@@ -279,16 +287,16 @@ export default function SettingsPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="security" className="space-y-6">
+            <TabsContent value="security" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
                     Password & Security
                   </CardTitle>
-                  <CardDescription>Manage your password and security settings</CardDescription>
+                  <CardDescription className="text-sm">Manage your password and security settings</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 sm:p-6">
                   <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="current-password">Current Password</Label>
@@ -363,8 +371,8 @@ export default function SettingsPage() {
                       )}
                     </div>
 
-                    <div className="flex justify-end">
-                      <Button type="submit" disabled={isLoading}>
+                    <div className="flex justify-end pt-4">
+                      <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                         {isLoading ? "Updating..." : "Update Password"}
                       </Button>
                     </div>
@@ -373,19 +381,19 @@ export default function SettingsPage() {
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-destructive">Danger Zone</CardTitle>
-                  <CardDescription>Irreversible and destructive actions</CardDescription>
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-destructive text-base sm:text-lg">Danger Zone</CardTitle>
+                  <CardDescription className="text-sm">Irreversible and destructive actions</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 sm:p-6">
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="destructive">
+                      <Button variant="destructive" className="w-full sm:w-auto">
                         <Trash2 className="w-4 h-4 mr-2" />
                         Delete Account
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="mx-4 sm:mx-0">
                       <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -408,68 +416,72 @@ export default function SettingsPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="notifications" className="space-y-6">
+            <TabsContent value="notifications" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Bell className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                     Notification Preferences
                   </CardTitle>
-                  <CardDescription>Choose what notifications you want to receive</CardDescription>
+                  <CardDescription className="text-sm">Choose what notifications you want to receive</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Email Notifications</Label>
-                        <p className="text-sm text-muted-foreground">
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <Label className="text-sm sm:text-base">Email Notifications</Label>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                           Receive email notifications about your account activity
                         </p>
                       </div>
                       <Switch
                         checked={notifications.emailNotifications}
                         onCheckedChange={(checked) => updateNotification("emailNotifications", checked)}
+                        className="flex-shrink-0"
                       />
                     </div>
 
                     <Separator />
 
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Marketing Emails</Label>
-                        <p className="text-sm text-muted-foreground">
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <Label className="text-sm sm:text-base">Marketing Emails</Label>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                           Receive emails about new features and promotions
                         </p>
                       </div>
                       <Switch
                         checked={notifications.marketingEmails}
                         onCheckedChange={(checked) => updateNotification("marketingEmails", checked)}
+                        className="flex-shrink-0"
                       />
                     </div>
 
                     <Separator />
 
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Security Alerts</Label>
-                        <p className="text-sm text-muted-foreground">Get notified about important security events</p>
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <Label className="text-sm sm:text-base">Security Alerts</Label>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Get notified about important security events</p>
                       </div>
                       <Switch
                         checked={notifications.securityAlerts}
                         onCheckedChange={(checked) => updateNotification("securityAlerts", checked)}
+                        className="flex-shrink-0"
                       />
                     </div>
 
                     <Separator />
 
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Link Updates</Label>
-                        <p className="text-sm text-muted-foreground">Notifications when your links receive clicks</p>
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <Label className="text-sm sm:text-base">Link Updates</Label>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Notifications when your links receive clicks</p>
                       </div>
                       <Switch
                         checked={notifications.linkUpdates}
                         onCheckedChange={(checked) => updateNotification("linkUpdates", checked)}
+                        className="flex-shrink-0"
                       />
                     </div>
                   </div>
@@ -477,31 +489,34 @@ export default function SettingsPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="appearance" className="space-y-6">
+            <TabsContent value="appearance" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Palette className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Palette className="w-4 h-4 sm:w-5 sm:h-5" />
                     Appearance Settings
                   </CardTitle>
-                  <CardDescription>Customize how LinkWeaver looks and feels</CardDescription>
+                  <CardDescription className="text-sm">Customize how LinkWeaver looks and feels</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Theme</Label>
-                        <p className="text-sm text-muted-foreground">Choose your preferred theme</p>
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <Label className="text-sm sm:text-base">Theme</Label>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Choose your preferred theme</p>
                       </div>
                       <ThemeToggle />
                     </div>
 
                     <Separator />
 
-                    <div className="space-y-2">
-                      <Label>Language</Label>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm sm:text-base">Language</Label>
+                        <p className="text-xs sm:text-sm text-muted-foreground sm:hidden">Select your preferred language</p>
+                      </div>
                       <Select defaultValue="en">
-                        <SelectTrigger className="w-[200px]">
+                        <SelectTrigger className="w-full sm:w-[200px]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -515,10 +530,13 @@ export default function SettingsPage() {
 
                     <Separator />
 
-                    <div className="space-y-2">
-                      <Label>Timezone</Label>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm sm:text-base">Timezone</Label>
+                        <p className="text-xs sm:text-sm text-muted-foreground sm:hidden">Select your timezone</p>
+                      </div>
                       <Select defaultValue="utc">
-                        <SelectTrigger className="w-[200px]">
+                        <SelectTrigger className="w-full sm:w-[200px]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -534,53 +552,55 @@ export default function SettingsPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="billing" className="space-y-6">
+            <TabsContent value="billing" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
                     Billing & Subscription
                   </CardTitle>
-                  <CardDescription>Manage your subscription and billing information</CardDescription>
+                  <CardDescription className="text-sm">Manage your subscription and billing information</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border rounded-lg">
                     <div>
-                      <h3 className="font-semibold">Current Plan</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <h3 className="font-semibold text-sm sm:text-base">Current Plan</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         You're currently on the {user?.plan || "Free"} plan
                       </p>
                     </div>
-                    <Badge variant="secondary" className="capitalize">
+                    <Badge variant="secondary" className="capitalize self-start sm:self-center">
                       {user?.plan || "Free"}
                     </Badge>
                   </div>
 
                   <div className="space-y-4">
-                    <h4 className="font-medium">Usage This Month</h4>
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-sm">
-                        <span>Links Created</span>
-                        <span>24 / 100</span>
+                    <h4 className="font-medium text-sm sm:text-base">Usage This Month</h4>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs sm:text-sm">
+                          <span>Links Created</span>
+                          <span>24 / 100</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div className="bg-primary h-2 rounded-full" style={{ width: "24%" }} />
+                        </div>
                       </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div className="bg-primary h-2 rounded-full" style={{ width: "24%" }} />
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-sm">
-                        <span>Total Clicks</span>
-                        <span>1,247 / 10,000</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div className="bg-primary h-2 rounded-full" style={{ width: "12.47%" }} />
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs sm:text-sm">
+                          <span>Total Clicks</span>
+                          <span>1,247 / 10,000</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div className="bg-primary h-2 rounded-full" style={{ width: "12.47%" }} />
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-3">
-                    <Button>Upgrade Plan</Button>
-                    <Button variant="outline">View Billing History</Button>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button className="w-full sm:w-auto">Upgrade Plan</Button>
+                    <Button variant="outline" className="w-full sm:w-auto">View Billing History</Button>
                   </div>
                 </CardContent>
               </Card>

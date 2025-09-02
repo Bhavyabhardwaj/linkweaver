@@ -161,7 +161,6 @@ export default function AnalyticsPage() {
       setAnalytics(safeAnalytics)
     } catch (error) {
       console.error("Failed to load analytics:", error)
-      // Show empty state on error instead of fake data
       setAnalytics(emptyAnalyticsData)
       toast({
         title: "Failed to Load Analytics",
@@ -205,9 +204,9 @@ export default function AnalyticsPage() {
     return (
       <ProtectedRoute>
         <DashboardLayout>
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-0">
             <Skeleton className="h-12 w-full" />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
@@ -250,16 +249,16 @@ export default function AnalyticsPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="flex items-center justify-between">
+        <div className="space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-0 pb-6">
+          {/* Header - Mobile Responsive */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold font-inter">Analytics Dashboard</h1>
-              <p className="text-muted-foreground font-dm-sans">Comprehensive insights into your link performance</p>
+              <h1 className="text-2xl sm:text-3xl font-bold font-inter">Analytics Dashboard</h1>
+              <p className="text-muted-foreground font-dm-sans text-sm sm:text-base">Comprehensive insights into your link performance</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -268,19 +267,19 @@ export default function AnalyticsPage() {
                   <SelectItem value="90d">Last 90 days</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" onClick={refreshData} disabled={refreshing}>
+              <Button variant="outline" onClick={refreshData} disabled={refreshing} className="w-full sm:w-auto">
                 <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
                 Refresh
               </Button>
-              <Button variant="outline" onClick={exportData}>
+              <Button variant="outline" onClick={exportData} className="w-full sm:w-auto">
                 <Download className="w-4 h-4 mr-2" />
                 Export
               </Button>
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Stats Grid - Mobile Responsive */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.title}
@@ -289,16 +288,16 @@ export default function AnalyticsPage() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card className="hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
                         <div className="flex items-center gap-2 mt-2">
-                          <span className="text-2xl font-bold">{(stat.value || 0).toLocaleString()}</span>
+                          <span className="text-xl sm:text-2xl font-bold">{(stat.value || 0).toLocaleString()}</span>
                         </div>
                       </div>
-                      <div className="p-3 rounded-lg bg-primary/10">
-                        <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                      <div className="p-2 sm:p-3 rounded-lg bg-primary/10">
+                        <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`} />
                       </div>
                     </div>
                   </CardContent>
@@ -307,33 +306,39 @@ export default function AnalyticsPage() {
             ))}
           </div>
 
-          {/* Main Analytics */}
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="geographic">Geographic</TabsTrigger>
-              <TabsTrigger value="devices">Devices</TabsTrigger>
-              <TabsTrigger value="traffic">Traffic</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
-            </TabsList>
+          {/* Main Analytics - Mobile Responsive Tabs */}
+          <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+            <div className="overflow-x-auto">
+              <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 min-w-max w-full">
+                <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+                <TabsTrigger value="geographic" className="text-xs sm:text-sm">Geographic</TabsTrigger>
+                <TabsTrigger value="devices" className="text-xs sm:text-sm">Devices</TabsTrigger>
+                <TabsTrigger value="traffic" className="text-xs sm:text-sm">Traffic</TabsTrigger>
+                <TabsTrigger value="performance" className="text-xs sm:text-sm">Performance</TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value="overview" className="space-y-6">
+            <TabsContent value="overview" className="space-y-4 sm:space-y-6">
               {/* Click Trends */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                     Click Trends
                   </CardTitle>
                   <CardDescription>Daily clicks over time</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-80">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="h-60 sm:h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={analytics.clicks}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" tickFormatter={(value) => new Date(value).toLocaleDateString()} />
-                        <YAxis />
+                        <XAxis 
+                          dataKey="date" 
+                          tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                          fontSize={12}
+                        />
+                        <YAxis fontSize={12} />
                         <Tooltip
                           labelFormatter={(value) => new Date(value).toLocaleDateString()}
                           formatter={(value, name) => [value, "Clicks"]}
@@ -355,20 +360,20 @@ export default function AnalyticsPage() {
 
               {/* Hourly Distribution */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
                     Hourly Distribution
                   </CardTitle>
                   <CardDescription>When your audience is most active</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-64">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="h-48 sm:h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={analytics.hourlyDistribution}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="hour" />
-                        <YAxis />
+                        <XAxis dataKey="hour" fontSize={12} />
+                        <YAxis fontSize={12} />
                         <Tooltip />
                         <Bar dataKey="clicks" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
                       </BarChart>
@@ -378,39 +383,39 @@ export default function AnalyticsPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="geographic" className="space-y-6">
+            <TabsContent value="geographic" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Globe className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
                     Geographic Distribution
                   </CardTitle>
                   <CardDescription>Where your clicks are coming from</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-3 sm:space-y-4">
                     {analytics.countries.map((country, index) => (
                       <motion.div
                         key={country.code}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                        className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{country.flag}</span>
-                          <div>
-                            <p className="font-medium">{country.name}</p>
-                            <p className="text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                          <span className="text-lg sm:text-2xl flex-shrink-0">{country.flag}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm sm:text-base truncate">{country.name}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                               {(country.clicks || 0).toLocaleString()} clicks
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-24">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                          <div className="w-16 sm:w-24">
                             <Progress value={country.percentage || 0} className="h-2" />
                           </div>
-                          <Badge variant="outline">{country.percentage || 0}%</Badge>
+                          <Badge variant="outline" className="text-xs">{country.percentage || 0}%</Badge>
                         </div>
                       </motion.div>
                     ))}
@@ -419,18 +424,18 @@ export default function AnalyticsPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="devices" className="space-y-6">
-              <div className="grid lg:grid-cols-2 gap-6">
+            <TabsContent value="devices" className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Smartphone className="w-5 h-5" />
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <Smartphone className="w-4 h-4 sm:w-5 sm:h-5" />
                       Device Breakdown
                     </CardTitle>
                     <CardDescription>How users access your links</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="h-64">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="h-48 sm:h-64">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
@@ -439,9 +444,10 @@ export default function AnalyticsPage() {
                             cy="50%"
                             labelLine={false}
                             label={({ name, value }) => `${name} ${value}%`}
-                            outerRadius={80}
+                            outerRadius={60}
                             fill="#8884d8"
                             dataKey="value"
+                            fontSize={12}
                           >
                             {analytics.devices.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -455,12 +461,12 @@ export default function AnalyticsPage() {
                 </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Device Details</CardTitle>
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="text-base sm:text-lg">Device Details</CardTitle>
                     <CardDescription>Detailed device statistics</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="space-y-3 sm:space-y-4">
                       {analytics.devices.map((device, index) => (
                         <motion.div
                           key={device.name}
@@ -469,14 +475,14 @@ export default function AnalyticsPage() {
                           transition={{ delay: index * 0.1 }}
                           className="flex items-center justify-between p-3 rounded-lg bg-muted"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: device.color }} />
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full" style={{ backgroundColor: device.color }} />
                             <div>
-                              <p className="font-medium">{device.name}</p>
-                              <p className="text-sm text-muted-foreground">{device.value}% of traffic</p>
+                              <p className="font-medium text-sm sm:text-base">{device.name}</p>
+                              <p className="text-xs sm:text-sm text-muted-foreground">{device.value}% of traffic</p>
                             </div>
                           </div>
-                          <Badge variant="outline">{device.value}%</Badge>
+                          <Badge variant="outline" className="text-xs">{device.value}%</Badge>
                         </motion.div>
                       ))}
                     </div>
@@ -485,42 +491,42 @@ export default function AnalyticsPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="traffic" className="space-y-6">
+            <TabsContent value="traffic" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ExternalLink className="w-5 h-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
                     Traffic Sources
                   </CardTitle>
                   <CardDescription>Where your traffic is coming from</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-3 sm:space-y-4">
                     {analytics.referrers.map((referrer, index) => (
                       <motion.div
                         key={referrer.name}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                        className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                           <div
-                            className="w-4 h-4 rounded-full"
+                            className="w-3 h-3 sm:w-4 sm:h-4 rounded-full flex-shrink-0"
                             style={{ backgroundColor: COLORS[index % COLORS.length] }}
                           />
-                          <div>
-                            <p className="font-medium">{referrer.name}</p>
-                            <p className="text-sm text-muted-foreground">
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm sm:text-base truncate">{referrer.name}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                               {(referrer.clicks || 0).toLocaleString()} clicks
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-24">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                          <div className="w-16 sm:w-24">
                             <Progress value={referrer.percentage || 0} className="h-2" />
                           </div>
-                          <Badge variant="outline">{referrer.percentage || 0}%</Badge>
+                          <Badge variant="outline" className="text-xs">{referrer.percentage || 0}%</Badge>
                         </div>
                       </motion.div>
                     ))}
@@ -529,33 +535,33 @@ export default function AnalyticsPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="performance" className="space-y-6">
-              <div className="grid lg:grid-cols-3 gap-6">
+            <TabsContent value="performance" className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Conversion Rate</CardTitle>
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="text-base sm:text-lg">Conversion Rate</CardTitle>
                     <CardDescription>Click-through performance</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 sm:p-6">
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-green-500 mb-2">
+                      <div className="text-3xl sm:text-4xl font-bold text-green-500 mb-2">
                         {(analytics.overview.conversionRate || 0).toFixed(1)}%
                       </div>
-                      <p className="text-sm text-muted-foreground">Average conversion rate</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Average conversion rate</p>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Top Performing Link</CardTitle>
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="text-base sm:text-lg">Top Performing Link</CardTitle>
                     <CardDescription>Your best content</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 sm:p-6">
                     <div className="text-center">
-                      <div className="text-lg font-semibold mb-2">{analytics.overview.topPerformingLink || "N/A"}</div>
-                      <p className="text-sm text-muted-foreground mb-2">Most clicked link</p>
-                      <Button variant="outline" size="sm">
+                      <div className="text-base sm:text-lg font-semibold mb-2 truncate">{analytics.overview.topPerformingLink || "N/A"}</div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-2">Most clicked link</p>
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto">
                         <ExternalLink className="w-4 h-4 mr-2" />
                         View Details
                       </Button>
@@ -563,17 +569,17 @@ export default function AnalyticsPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Today's Performance</CardTitle>
+                <Card className="sm:col-span-2 lg:col-span-1">
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="text-base sm:text-lg">Today's Performance</CardTitle>
                     <CardDescription>Real-time metrics</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 sm:p-6">
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-blue-500 mb-2">
+                      <div className="text-3xl sm:text-4xl font-bold text-blue-500 mb-2">
                         {(analytics.overview.clicksToday || 0).toLocaleString()}
                       </div>
-                      <p className="text-sm text-muted-foreground">Clicks today</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Clicks today</p>
                     </div>
                   </CardContent>
                 </Card>
