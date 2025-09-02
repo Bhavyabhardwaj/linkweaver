@@ -455,9 +455,9 @@ export default function ShortLinksPage() {
     return (
       <ProtectedRoute>
         <DashboardLayout>
-          <div className="space-y-6">
+          <div className="space-y-6 px-4 sm:px-6 lg:px-0">
             <Skeleton className="h-12 w-full" />
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
@@ -473,24 +473,24 @@ export default function ShortLinksPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-0 pb-6">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Short Links</h1>
-              <p className="text-muted-foreground">Create and manage your shortened URLs with advanced features</p>
+              <h1 className="text-2xl sm:text-3xl font-bold font-inter">Short Links</h1>
+              <p className="text-muted-foreground font-dm-sans text-sm sm:text-base">Create and manage your shortened URLs with advanced features</p>
             </div>
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
+                <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity font-work-sans w-full sm:w-auto">
                   <Plus className="w-4 h-4 mr-2" />
                   Create Short Link
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+              <DialogContent className="sm:max-w-[600px] mx-4 sm:mx-0 max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Create Short Link</DialogTitle>
-                  <DialogDescription>
+                  <DialogTitle className="font-inter">Create Short Link</DialogTitle>
+                  <DialogDescription className="font-dm-sans">
                     Create a shortened URL with advanced features like password protection and expiration
                   </DialogDescription>
                 </DialogHeader>
@@ -498,15 +498,15 @@ export default function ShortLinksPage() {
                   {/* Basic Information */}
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="url">Destination URL *</Label>
+                      <Label htmlFor="url" className="font-work-sans">Destination URL *</Label>
                       <Input id="url" placeholder="https://example.com/very-long-url" {...form.register("url")} />
                       {form.formState.errors.url && (
-                        <p className="text-sm text-destructive">{form.formState.errors.url.message}</p>
+                        <p className="text-sm text-destructive font-dm-sans">{form.formState.errors.url.message}</p>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="slug">Custom Slug (optional)</Label>
+                      <Label htmlFor="slug" className="font-work-sans">Custom Slug (optional)</Label>
                       <div className="relative">
                         <Input
                           id="slug"
@@ -530,18 +530,18 @@ export default function ShortLinksPage() {
                         )}
                       </div>
                       {slugAvailable === false && (
-                        <p className="text-sm text-destructive">This slug is already taken</p>
+                        <p className="text-sm text-destructive font-dm-sans">This slug is already taken</p>
                       )}
-                      {slugAvailable === true && <p className="text-sm text-green-600">This slug is available</p>}
+                      {slugAvailable === true && <p className="text-sm text-green-600 font-dm-sans">This slug is available</p>}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="title">Title</Label>
+                        <Label htmlFor="title" className="font-work-sans">Title</Label>
                         <Input id="title" placeholder="My Awesome Link" {...form.register("title")} />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="clickLimit">Click Limit</Label>
+                        <Label htmlFor="clickLimit" className="font-work-sans">Click Limit</Label>
                         <Input
                           id="clickLimit"
                           type="number"
@@ -557,6 +557,7 @@ export default function ShortLinksPage() {
                         id="description"
                         placeholder="Description of your link..."
                         {...form.register("description")}
+                        className="resize-none"
                       />
                     </div>
                   </div>
@@ -591,7 +592,7 @@ export default function ShortLinksPage() {
 
                     <div className="space-y-2">
                       <Label>Expiration</Label>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
                         {expirationPresets.map((preset) => (
                           <Button
                             key={preset.value}
@@ -599,6 +600,7 @@ export default function ShortLinksPage() {
                             variant={expirationPreset === preset.value ? "default" : "outline"}
                             size="sm"
                             onClick={() => setExpirationPreset(preset.value)}
+                            className="text-xs"
                           >
                             {preset.label}
                           </Button>
@@ -622,11 +624,11 @@ export default function ShortLinksPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)} className="order-2 sm:order-1">
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={isCreating || slugAvailable === false}>
+                    <Button type="submit" disabled={isCreating || slugAvailable === false} className="order-1 sm:order-2">
                       {isCreating ? "Creating..." : "Create Short Link"}
                     </Button>
                   </div>
@@ -636,56 +638,56 @@ export default function ShortLinksPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Clicks</p>
-                    <p className="text-2xl font-bold">{totalClicks.toLocaleString()}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Clicks</p>
+                    <p className="text-xl sm:text-2xl font-bold">{totalClicks.toLocaleString()}</p>
                   </div>
-                  <TrendingUp className="w-8 h-8 text-primary" />
+                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Active Links</p>
-                    <p className="text-2xl font-bold">{activeLinks}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Links</p>
+                    <p className="text-xl sm:text-2xl font-bold">{activeLinks}</p>
                   </div>
-                  <ExternalLink className="w-8 h-8 text-secondary" />
+                  <ExternalLink className="w-6 h-6 sm:w-8 sm:h-8 text-secondary" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Links</p>
-                    <p className="text-2xl font-bold">{Array.isArray(links) ? links.length : 0}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Links</p>
+                    <p className="text-xl sm:text-2xl font-bold">{Array.isArray(links) ? links.length : 0}</p>
                   </div>
-                  <Calendar className="w-8 h-8 text-accent" />
+                  <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Protected</p>
-                    <p className="text-2xl font-bold">{Array.isArray(links) ? links.filter((l) => l.hasPassword).length : 0}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Protected</p>
+                    <p className="text-xl sm:text-2xl font-bold">{Array.isArray(links) ? links.filter((l) => l.hasPassword).length : 0}</p>
                   </div>
-                  <Shield className="w-8 h-8 text-orange-500" />
+                  <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Search and Filters */}
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="relative flex-1 sm:max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search links..."
@@ -694,30 +696,32 @@ export default function ShortLinksPage() {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              Filter
-            </Button>
-            {selectedLinks.length > 0 && (
-              <Button variant="outline" className="text-destructive bg-transparent">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Selected ({selectedLinks.length})
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" className="w-full sm:w-auto">
+                <Filter className="w-4 h-4 mr-2" />
+                Filter
               </Button>
-            )}
+              {selectedLinks.length > 0 && (
+                <Button variant="outline" className="text-destructive bg-transparent w-full sm:w-auto">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Selected ({selectedLinks.length})
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Links Table */}
           <Card>
-            <CardHeader>
-              <CardTitle>Your Short Links</CardTitle>
-              <CardDescription>Manage and track your shortened URLs with advanced features</CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="font-inter">Your Short Links</CardTitle>
+              <CardDescription className="font-dm-sans">Manage and track your shortened URLs with advanced features</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0 sm:p-6">
               {filteredLinks.length === 0 ? (
-                <div className="text-center py-12">
-                  <ExternalLink className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <h3 className="mt-4 text-lg font-semibold">No short links yet</h3>
-                  <p className="text-muted-foreground">Create your first short link to get started</p>
+                <div className="text-center py-8 sm:py-12 px-4 sm:px-0">
+                  <ExternalLink className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground" />
+                  <h3 className="mt-4 text-base sm:text-lg font-semibold font-work-sans">No short links yet</h3>
+                  <p className="text-muted-foreground font-dm-sans text-sm">Create your first short link to get started</p>
                   <Button className="mt-4" onClick={() => setCreateDialogOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Create Short Link
@@ -740,13 +744,13 @@ export default function ShortLinksPage() {
                             }}
                           />
                         </TableHead>
-                        <TableHead>Link</TableHead>
-                        <TableHead>Original URL</TableHead>
-                        <TableHead>Clicks</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Security</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead className="w-[100px]">Actions</TableHead>
+                        <TableHead className="min-w-[200px]">Link</TableHead>
+                        <TableHead className="min-w-[150px] hidden sm:table-cell">Original URL</TableHead>
+                        <TableHead className="min-w-[80px]">Clicks</TableHead>
+                        <TableHead className="min-w-[100px] hidden md:table-cell">Status</TableHead>
+                        <TableHead className="min-w-[100px] hidden lg:table-cell">Security</TableHead>
+                        <TableHead className="min-w-[80px] hidden lg:table-cell">Created</TableHead>
+                        <TableHead className="w-[50px]">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -765,15 +769,15 @@ export default function ShortLinksPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <div className="space-y-1">
-                              <div className="font-medium">{link.title || "Untitled"}</div>
-                              <div className="text-sm text-muted-foreground font-mono flex items-center gap-2">
-                                {link.shortUrl}
+                            <div className="space-y-1 min-w-0">
+                              <div className="font-medium text-sm truncate">{link.title || "Untitled"}</div>
+                              <div className="text-xs text-muted-foreground font-mono flex items-center gap-2">
+                                <span className="truncate">{link.shortUrl}</span>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => copyToClipboard(`https://${link.shortUrl}`)}
-                                  className="h-6 w-6 p-0"
+                                  className="h-6 w-6 p-0 flex-shrink-0"
                                 >
                                   <Copy className="w-3 h-3" />
                                 </Button>
@@ -789,22 +793,56 @@ export default function ShortLinksPage() {
                                   <Progress value={getClickProgress(link)} className="h-1" />
                                 </div>
                               )}
+                              {/* Mobile-only info */}
+                              <div className="sm:hidden space-y-1">
+                                <div className="text-xs text-muted-foreground truncate">{link.url}</div>
+                                <div className="flex flex-wrap gap-1">
+                                  <div className="flex items-center gap-2">
+                                    <Switch 
+                                      checked={link.active} 
+                                      onCheckedChange={() => toggleLinkStatus(link.id)}
+                                      className="scale-75"
+                                    />
+                                    {getStatusBadge(link)}
+                                  </div>
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {link.hasPassword && (
+                                    <Badge variant="outline" className="text-xs">
+                                      <Shield className="w-3 h-3 mr-1" />
+                                      Protected
+                                    </Badge>
+                                  )}
+                                  {link.expiresAt && (
+                                    <Badge variant="outline" className="text-xs">
+                                      <Clock className="w-3 h-3 mr-1" />
+                                      {link.status === "expired" ? "Expired" : "Expires"}
+                                    </Badge>
+                                  )}
+                                  {link.qrCodeUrl && (
+                                    <Badge variant="outline" className="text-xs">
+                                      <QrCode className="w-3 h-3 mr-1" />
+                                      QR
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div className="max-w-xs truncate text-muted-foreground">{link.url}</div>
+                          <TableCell className="hidden sm:table-cell">
+                            <div className="max-w-xs truncate text-muted-foreground text-sm">{link.url}</div>
                           </TableCell>
                           <TableCell>
-                            <div className="font-medium">{(link.clicks || 0).toLocaleString()}</div>
+                            <div className="font-medium text-sm">{(link.clicks || 0).toLocaleString()}</div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden md:table-cell">
                             <div className="flex items-center gap-2">
                               <Switch checked={link.active} onCheckedChange={() => toggleLinkStatus(link.id)} />
                               {getStatusBadge(link)}
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
+                          <TableCell className="hidden lg:table-cell">
+                            <div className="flex flex-wrap gap-1">
                               {link.hasPassword && (
                                 <Badge variant="outline" className="text-xs">
                                   <Shield className="w-3 h-3 mr-1" />
@@ -825,7 +863,7 @@ export default function ShortLinksPage() {
                               )}
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden lg:table-cell">
                             <div className="text-sm text-muted-foreground">
                               {link.createdAt ? new Date(link.createdAt).toLocaleDateString() : 'N/A'}
                             </div>
@@ -833,7 +871,7 @@ export default function ShortLinksPage() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                                   <MoreHorizontal className="w-4 h-4" />
                                 </Button>
                               </DropdownMenuTrigger>
@@ -888,7 +926,7 @@ export default function ShortLinksPage() {
 
           {/* Edit Dialog */}
           <Dialog open={!!editingLink} onOpenChange={() => setEditingLink(null)}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] mx-4 sm:mx-0 max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Short Link</DialogTitle>
                 <DialogDescription>Update your short link information and settings</DialogDescription>
@@ -923,11 +961,11 @@ export default function ShortLinksPage() {
                     <Input id="edit-expiresAt" type="datetime-local" {...editForm.register("expiresAt")} />
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setEditingLink(null)}>
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setEditingLink(null)} className="order-2 sm:order-1">
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={isUpdating}>
+                    <Button type="submit" disabled={isUpdating} className="order-1 sm:order-2">
                       {isUpdating ? "Updating..." : "Update Link"}
                     </Button>
                   </div>
@@ -938,7 +976,7 @@ export default function ShortLinksPage() {
 
           {/* Delete Confirmation Dialog */}
           <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-            <AlertDialogContent>
+            <AlertDialogContent className="mx-4 sm:mx-0">
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>

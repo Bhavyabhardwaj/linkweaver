@@ -113,11 +113,11 @@ export default function SignUpPage() {
   }
 
   const handleOAuthSignup = (provider: "github" | "google") => {
-    window.location.href = `https://linkweaver.bhavya.live/api/auth/${provider}`
+    window.location.href = `https://linkweaver.bhavya.live/api/oauth/${provider}`
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       {/* Subtle background pattern */}
       <div
         className="absolute inset-0 opacity-[0.015]"
@@ -135,22 +135,22 @@ export default function SignUpPage() {
         <div className="mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to home
           </Link>
         </div>
 
-        <Card className="bg-white border border-gray-200 shadow-lg">
+        <Card className="bg-card border-border shadow-lg">
           <CardHeader className="text-center pb-6">
             <div className="flex justify-center mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center">
                 <Zap className="w-6 h-6 text-white" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900">Create your account</CardTitle>
-            <CardDescription className="text-gray-600">
+            <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
+            <CardDescription>
               Join thousands of creators building amazing link experiences
             </CardDescription>
           </CardHeader>
@@ -159,7 +159,7 @@ export default function SignUpPage() {
               <Button
                 variant="outline"
                 onClick={() => handleOAuthSignup("github")}
-                className="w-full border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all"
+                className="w-full border-border hover:bg-accent hover:border-accent-foreground/20 transition-all"
               >
                 <Github className="w-4 h-4 mr-2" />
                 GitHub
@@ -167,7 +167,7 @@ export default function SignUpPage() {
               <Button
                 variant="outline"
                 onClick={() => handleOAuthSignup("google")}
-                className="w-full border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all"
+                className="w-full border-border hover:bg-accent hover:border-accent-foreground/20 transition-all"
               >
                 <Chrome className="w-4 h-4 mr-2" />
                 Google
@@ -176,16 +176,16 @@ export default function SignUpPage() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <Separator className="bg-gray-200" />
+                <Separator />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500 font-medium">Or continue with email</span>
+                <span className="bg-card px-2 text-muted-foreground font-medium">Or continue with email</span>
               </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-700 font-medium">
+                <Label htmlFor="name" className="font-medium">
                   Full Name
                 </Label>
                 <Input
@@ -193,14 +193,14 @@ export default function SignUpPage() {
                   type="text"
                   placeholder="Enter your full name"
                   {...register("username")}
-                  className={`border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${errors.username ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+                  className={`${errors.username ? "border-destructive focus:border-destructive focus:ring-destructive" : ""
                     }`}
                 />
                 {errors.username && (
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-red-600"
+                    className="text-sm text-destructive"
                   >
                     {errors.username.message}
                   </motion.p>
@@ -208,7 +208,7 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700 font-medium">
+                <Label htmlFor="email" className="font-medium">
                   Email Address
                 </Label>
                 <Input
@@ -216,14 +216,14 @@ export default function SignUpPage() {
                   type="email"
                   placeholder="Enter your email"
                   {...register("email")}
-                  className={`border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${errors.email ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+                  className={`${errors.email ? "border-destructive focus:border-destructive focus:ring-destructive" : ""
                     }`}
                 />
                 {errors.email && (
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-red-600"
+                    className="text-sm text-destructive"
                   >
                     {errors.email.message}
                   </motion.p>
@@ -231,7 +231,7 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700 font-medium">
+                <Label htmlFor="password" className="font-medium">
                   Password
                 </Label>
                 <div className="relative">
@@ -240,7 +240,7 @@ export default function SignUpPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a strong password"
                     {...register("password")}
-                    className={`border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-10 ${errors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+                    className={`pr-10 ${errors.password ? "border-destructive focus:border-destructive focus:ring-destructive" : ""
                       }`}
                   />
                   <Button
@@ -258,7 +258,7 @@ export default function SignUpPage() {
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-red-600"
+                    className="text-sm text-destructive"
                   >
                     {errors.password.message}
                   </motion.p>
@@ -266,7 +266,7 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
+                <Label htmlFor="confirmPassword" className="font-medium">
                   Confirm Password
                 </Label>
                 <div className="relative">
@@ -275,7 +275,7 @@ export default function SignUpPage() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm your password"
                     {...register("confirmPassword")}
-                    className={`border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-10 ${errors.confirmPassword ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+                    className={`pr-10 ${errors.confirmPassword ? "border-destructive focus:border-destructive focus:ring-destructive" : ""
                       }`}
                   />
                   <Button
@@ -292,7 +292,7 @@ export default function SignUpPage() {
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-red-600"
+                    className="text-sm text-destructive"
                   >
                     {errors.confirmPassword.message}
                   </motion.p>
@@ -308,20 +308,20 @@ export default function SignUpPage() {
                       id="terms"
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      className="mt-1 border-gray-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                      className="mt-1"
                     />
                   )}
                 />
 
 
                 <div className="grid gap-1.5 leading-none">
-                  <Label htmlFor="terms" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
+                  <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
                     I agree to the{" "}
-                    <Link href="/terms" className="text-blue-600 hover:text-blue-700 underline">
+                    <Link href="/terms" className="text-primary hover:text-primary/80 underline">
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="text-blue-600 hover:text-blue-700 underline">
+                    <Link href="/privacy" className="text-primary hover:text-primary/80 underline">
                       Privacy Policy
                     </Link>
                   </Label>
@@ -329,7 +329,7 @@ export default function SignUpPage() {
                     <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-sm text-red-600"
+                      className="text-sm text-destructive"
                     >
                       {errors.terms.message}
                     </motion.p>
@@ -339,7 +339,7 @@ export default function SignUpPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 py-3 font-semibold"
+                className="w-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 py-3 font-semibold"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -355,8 +355,8 @@ export default function SignUpPage() {
             </form>
 
             <div className="text-center text-sm">
-              <span className="text-gray-600">Already have an account? </span>
-              <Link href="/auth/signin" className="text-blue-600 hover:text-blue-700 font-medium underline">
+              <span className="text-muted-foreground">Already have an account? </span>
+              <Link href="/auth/signin" className="text-primary hover:text-primary/80 font-medium underline">
                 Sign in
               </Link>
             </div>

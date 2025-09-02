@@ -254,8 +254,8 @@ export default function AnalyticsPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-              <p className="text-muted-foreground">Comprehensive insights into your link performance</p>
+              <h1 className="text-3xl font-bold font-inter">Analytics Dashboard</h1>
+              <p className="text-muted-foreground font-dm-sans">Comprehensive insights into your link performance</p>
             </div>
             <div className="flex items-center gap-4">
               <Select value={timeRange} onValueChange={setTimeRange}>

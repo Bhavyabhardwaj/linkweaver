@@ -169,17 +169,17 @@ export default function SettingsPage() {
         <div className="space-y-8">
           {/* Header */}
           <div>
-            <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground">Manage your account settings and preferences</p>
+            <h1 className="text-3xl font-bold font-inter">Settings</h1>
+            <p className="text-muted-foreground font-dm-sans">Manage your account settings and preferences</p>
           </div>
 
           <Tabs defaultValue="profile" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="appearance">Appearance</TabsTrigger>
-              <TabsTrigger value="billing">Billing</TabsTrigger>
+              <TabsTrigger value="profile" className="font-work-sans">Profile</TabsTrigger>
+              <TabsTrigger value="security" className="font-work-sans">Security</TabsTrigger>
+              <TabsTrigger value="notifications" className="font-work-sans">Notifications</TabsTrigger>
+              <TabsTrigger value="appearance" className="font-work-sans">Appearance</TabsTrigger>
+              <TabsTrigger value="billing" className="font-work-sans">Billing</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">

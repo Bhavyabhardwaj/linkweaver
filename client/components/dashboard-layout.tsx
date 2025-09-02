@@ -100,12 +100,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center justify-between p-6 border-b border-border">
               <Link href="/dashboard" className="flex items-center gap-3 group">
                 <div className="relative">
-                  <div className="w-8 h-8 bg-black dark:bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                    <Link2 className="w-4 h-4 text-white dark:text-black" />
+                  <div className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center border border-gray-200">
+                    <img 
+                      src="/logo.png" 
+                      alt="LinkWeaver Logo" 
+                      className="w-8 h-8 object-contain"
+                    />
                   </div>
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
                 </div>
-                <span className="font-bold text-lg text-foreground">LinkWeaver</span>
+                <span className="font-bold text-lg text-foreground font-inter">LinkWeaver</span>
               </Link>
               <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
                 <X className="w-4 h-4" />
@@ -119,7 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`group flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      className={`group flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 font-work-sans ${
                         isActive
                           ? "bg-black dark:bg-white text-white dark:text-black shadow-lg"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -148,12 +152,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex h-16 shrink-0 items-center px-6 border-b border-border">
             <Link href="/dashboard" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="w-8 h-8 bg-black dark:bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                  <Link2 className="w-4 h-4 text-white dark:text-black" />
+                <div className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center border border-gray-200">
+                  <img 
+                    src="/logo.png" 
+                    alt="LinkWeaver Logo" 
+                    className="w-8 h-8 object-contain"
+                  />
                 </div>
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
               </div>
-              <span className="font-bold text-lg text-foreground">LinkWeaver</span>
+              <span className="font-bold text-lg text-foreground font-inter">LinkWeaver</span>
             </Link>
           </div>
 
@@ -165,7 +173,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    className={`group flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 font-work-sans ${
                       isActive
                         ? "bg-black dark:bg-white text-white dark:text-black shadow-lg"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -196,8 +204,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-left">
-                    <div className="text-sm font-semibold text-foreground">{user?.name || "Demo User"}</div>
-                    <div className="text-xs text-muted-foreground truncate">{user?.email || "demo@linkweaver.co"}</div>
+                    <div className="text-sm font-semibold text-foreground font-work-sans">{user?.name || "Demo User"}</div>
+                    <div className="text-xs text-muted-foreground truncate font-dm-sans">{user?.email || "demo@linkweaver.co"}</div>
                   </div>
                   <ChevronDown className="w-4 h-4 text-muted-foreground" />
                 </Button>

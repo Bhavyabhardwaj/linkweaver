@@ -12,7 +12,6 @@ import {
   Globe,
   Zap,
   Star,
-  LinkIcon,
   Eye,
   Play,
   CheckCircle,
@@ -27,10 +26,11 @@ import {
   Target,
   ChevronRight,
   Clock,
-  Award,
+  User,
   Palette,
   Code,
-  BarChart,
+  Layers,
+  Link as LinkIcon,
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -179,18 +179,31 @@ function Navigation() {
       <nav className="relative max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
         <Link href="/" className="flex items-center space-x-3 group">
           <motion.div 
-            className="relative w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl"
-            whileHover={{ scale: 1.1, rotate: 360 }}
-            transition={{ duration: 0.6, type: "spring" }}
+            className="relative w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg overflow-hidden border border-gray-200"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2, type: "spring", stiffness: 400 }}
           >
-            <LinkIcon className="w-5 h-5 text-white" />
+            <img 
+              src="/logo.png" 
+              alt="LinkWeaver Logo" 
+              className="w-10 h-10 object-contain"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = target.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white font-bold text-lg hidden">
+              LW
+            </div>
             <motion.div
-              className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl opacity-20 blur-lg"
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute inset-0 bg-emerald-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              initial={{ opacity: 0 }}
+              whileHover={{ opacity: 1 }}
             />
           </motion.div>
-          <span className="font-bold text-xl text-white">LinkWeaver</span>
+          <span className="font-bold text-xl text-white tracking-tight">LinkWeaver</span>
         </Link>
 
         <div className="hidden md:flex items-center space-x-8">
@@ -219,7 +232,7 @@ function Navigation() {
               >
                 {item.name}
                 <motion.span
-                  className="absolute -bottom-2 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500"
+                  className="absolute -bottom-2 left-0 h-0.5 bg-white"
                   initial={{ width: 0 }}
                   whileHover={{ width: "100%" }}
                   transition={{ duration: 0.3 }}
@@ -237,7 +250,7 @@ function Navigation() {
             </Button>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button asChild className="text-sm bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 relative overflow-hidden">
+            <Button asChild className="text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0 shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 relative overflow-hidden">
               <Link href="/auth/signup">
                 <motion.div
                   className="absolute inset-0 bg-white/20"
@@ -287,13 +300,18 @@ function HeroSection() {
   }, [mouseX, mouseY])
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 bg-black overflow-hidden">
+    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+      {/* Premium black-based background */}
+      <div className="absolute inset-0 bg-black"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 via-black to-gray-900/30"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-600/5 rounded-full filter blur-3xl"></div>
+      <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-teal-600/5 rounded-full filter blur-3xl"></div>
       <BackgroundBeams />
       <ShootingStars />
       <GridPattern />
       
       <motion.div
-        className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"
+        className="absolute w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"
         style={{
           x: springX,
           y: springY,
@@ -313,7 +331,7 @@ function HeroSection() {
             className="mb-8 bg-white/5 backdrop-blur-xl border border-white/10 text-gray-300 px-6 py-3 rounded-full text-sm relative overflow-hidden group"
           >
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20"
+              className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10"
               initial={{ x: "-100%" }}
               animate={{ x: "100%" }}
               transition={{ duration: 3, repeat: Infinity, repeatType: "loop" }}
@@ -325,26 +343,26 @@ function HeroSection() {
             >
               <Sparkles className="w-4 h-4" />
             </motion.div>
-            <span className="relative z-10">Trusted by creators worldwide</span>
+            <span className="relative z-10 font-medium font-work-sans">Trusted by creators worldwide</span>
           </Badge>
         </motion.div>
 
         <TextAnimate
-          className="text-5xl md:text-7xl font-bold mb-8 text-white tracking-tight"
+          className="text-5xl md:text-7xl font-bold mb-8 text-white tracking-tight leading-tight font-inter"
           delay={0.3}
         >
           The modern way to manage links
         </TextAnimate>
 
         <motion.p
-          className="text-xl md:text-2xl text-gray-400 mb-12 max-w-4xl mx-auto leading-relaxed"
+          className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed font-light font-dm-sans"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
           Create, customize, and track your links with{" "}
           <motion.span 
-            className="text-white font-semibold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
+            className="font-semibold text-emerald-400"
             whileHover={{ scale: 1.05 }}
           >
             powerful analytics
@@ -363,28 +381,14 @@ function HeroSection() {
             whileTap={{ scale: 0.95 }}
             className="group"
           >
-            <Button size="lg" asChild className="text-lg px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 shadow-2xl hover:shadow-blue-500/25 transition-all duration-500 rounded-2xl relative overflow-hidden">
+            <Button size="lg" asChild className="text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 border-0 shadow-xl transition-all duration-300 rounded-xl font-medium font-work-sans">
               <Link href="/auth/signup">
-                <motion.div
-                  className="absolute inset-0 bg-white/10"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.6 }}
-                />
                 <motion.span
-                  animate={{ x: [0, 2, 0] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="relative z-10"
+                  className="flex items-center"
                 >
                   Start for free
+                  <ArrowRight className="ml-2 w-5 h-5" />
                 </motion.span>
-                <motion.div
-                  className="ml-3 relative z-10"
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
-                >
-                  <ArrowRight className="w-5 h-5" />
-                </motion.div>
               </Link>
             </Button>
           </motion.div>
@@ -394,7 +398,7 @@ function HeroSection() {
             whileTap={{ scale: 0.95 }}
             className="group"
           >
-            <Button size="lg" variant="outline" asChild className="text-lg px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10 transition-all duration-500 rounded-2xl relative overflow-hidden">
+            <Button size="lg" variant="outline" asChild className="text-lg px-8 py-4 bg-transparent backdrop-blur-sm border border-gray-600 text-white hover:bg-white/5 hover:border-gray-500 transition-all duration-300 rounded-xl font-medium font-work-sans">
               <a 
                 href="#features"
                 onClick={(e) => {
@@ -402,20 +406,8 @@ function HeroSection() {
                   document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' })
                 }}
               >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.6 }}
-                />
-                <span className="relative z-10">View Features</span>
-                <motion.div
-                  className="ml-3 relative z-10"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                >
-                  <Eye className="w-5 h-5" />
-                </motion.div>
+                <span>View Features</span>
+                <Eye className="ml-2 w-5 h-5" />
               </a>
             </Button>
           </motion.div>
@@ -432,41 +424,41 @@ function FeaturesSection() {
       icon: <LinkIcon className="w-6 h-6" />,
       title: "Bio Links",
       description: "Create beautiful, customizable landing pages with all your important links in one place. Perfect for social media profiles.",
-      gradient: "from-blue-500 to-cyan-500",
+      gradient: "from-emerald-500 to-emerald-600",
       details: ["Custom themes", "Drag & drop reordering", "Click analytics", "Mobile optimized"]
     },
     {
       icon: <BarChart3 className="w-6 h-6" />,
       title: "Advanced Analytics",
       description: "Comprehensive tracking with real-time insights, geographic data, device information, and referrer analytics.",
-      gradient: "from-green-500 to-emerald-500",
+      gradient: "from-green-500 to-green-600",
       details: ["Real-time tracking", "Geographic insights", "Device analytics", "Referrer tracking"]
     },
     {
       icon: <QrCode className="w-6 h-6" />,
       title: "QR Code Generator",
       description: "Instantly generate QR codes for any link with customizable designs and high-resolution downloads.",
-      gradient: "from-purple-500 to-pink-500",
+      gradient: "from-teal-500 to-teal-600",
       details: ["Custom designs", "High-res downloads", "Batch generation", "Brand colors"]
     },
     {
       icon: <Shield className="w-6 h-6" />,
-      title: "Enterprise Security",
-      description: "Bank-grade security with SOC 2 compliance, advanced access controls, and enterprise-grade protection.",
-      gradient: "from-red-500 to-orange-500",
-      details: ["SOC 2 compliance", "Access controls", "SSL encryption", "Fraud protection"]
+      title: "Advanced Security",
+      description: "Enterprise-grade security with SSL encryption, password protection, and advanced access controls.",
+      gradient: "from-red-500 to-red-600",
+      details: ["SSL encryption", "Password protection", "Access controls", "Audit logs"]
     },
     {
       icon: <Globe className="w-6 h-6" />,
       title: "Global CDN",
-      description: "Lightning-fast redirects from our global CDN with intelligent routing and 99.9% uptime guarantee.",
-      gradient: "from-indigo-500 to-purple-500",
-      details: ["Global network", "Smart routing", "99.9% uptime", "Edge caching"]
+      description: "Lightning-fast link redirects powered by our global content delivery network for optimal performance.",
+      gradient: "from-cyan-500 to-cyan-600",
+      details: ["99.9% uptime", "Global servers", "Fast redirects", "Edge caching"]
     },
     {
       icon: <Zap className="w-6 h-6" />,
       title: "URL Shortener",
-      description: "Create branded short links with custom domains, expiration dates, and password protection.",
+      description: "Create memorable short links with custom domains, branded URLs, and advanced link management features.",
       gradient: "from-yellow-500 to-orange-500",
       details: ["Custom domains", "Password protection", "Expiration dates", "Bulk creation"]
     },
@@ -481,20 +473,23 @@ function FeaturesSection() {
       icon: <Users className="w-6 h-6" />,
       title: "Team Collaboration",
       description: "Collaborate with your team, share workspaces, assign roles, and manage links together efficiently.",
-      gradient: "from-teal-500 to-cyan-500",
+      gradient: "from-teal-500 to-emerald-500",
       details: ["Team workspaces", "Role management", "Shared analytics", "Permission controls"]
     },
     {
       icon: <Code className="w-6 h-6" />,
       title: "Developer API",
       description: "Robust REST API for developers with comprehensive documentation and SDK support for popular frameworks.",
-      gradient: "from-violet-500 to-purple-500",
+      gradient: "from-slate-500 to-gray-600",
       details: ["REST API", "SDK support", "Webhooks", "Rate limiting"]
     }
   ]
 
   return (
-    <section id="features" className="py-20 px-6 bg-black relative overflow-hidden">
+    <section id="features" className="py-20 px-6 relative overflow-hidden">
+      {/* Premium black background */}
+      <div className="absolute inset-0 bg-black"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 via-black to-gray-900/20"></div>
       <BackgroundBeams />
       <GridPattern />
       
@@ -512,26 +507,21 @@ function FeaturesSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <Badge className="mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 px-4 py-2 rounded-full relative overflow-hidden">
-              <motion.div
-                className="absolute inset-0 bg-white/20"
-                animate={{ x: ["-100%", "100%"] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              />
-              <Sparkles className="w-4 h-4 mr-2 relative z-10" />
-              <span className="relative z-10">Powerful Features</span>
+            <Badge className="mb-6 bg-white/10 backdrop-blur-sm border border-white/20 text-white px-4 py-2 rounded-full">
+              <Sparkles className="w-4 h-4 mr-2" />
+              <span className="font-medium">Powerful Features</span>
             </Badge>
           </motion.div>
           
           <TextAnimate
-            className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight"
+            className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight leading-tight"
             delay={0.2}
           >
             Complete Link Management Platform
           </TextAnimate>
           
           <motion.p
-            className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed"
+            className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -589,7 +579,7 @@ function FeaturesSection() {
                 </motion.h3>
                 
                 <motion.p
-                  className="text-gray-400 text-sm leading-relaxed mb-4"
+                  className="text-gray-400 text-sm leading-relaxed mb-4 font-light"
                   initial={{ opacity: 0.8 }}
                   whileHover={{ opacity: 1 }}
                 >
@@ -683,7 +673,7 @@ function FeaturesSection() {
           >
             <Button 
               asChild
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 border-0"
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 border-0"
             >
               <Link href="/auth/signup">
                 <motion.div
@@ -746,7 +736,7 @@ function InteractiveDemoSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <Badge className="mb-6 bg-gradient-to-r from-green-500 to-blue-500 text-white border-0 px-4 py-2 rounded-full relative overflow-hidden group">
+          <Badge className="mb-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 px-4 py-2 rounded-full relative overflow-hidden group">
             <motion.div
               className="absolute inset-0 bg-white/20"
               animate={{ rotate: 360 }}
@@ -790,7 +780,7 @@ function InteractiveDemoSection() {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                <label className="block text-sm font-semibold text-gray-300 mb-2 flex items-center">
+                <label className="text-sm font-semibold text-gray-300 mb-2 flex items-center">
                   <LinkIcon className="w-4 h-4 mr-2" />
                   Original URL
                 </label>
@@ -799,7 +789,7 @@ function InteractiveDemoSection() {
                     type="text"
                     value={inputUrl}
                     onChange={(e) => setInputUrl(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
                     placeholder="Enter your long URL"
                     whileFocus={{ scale: 1.02 }}
                   />
@@ -813,7 +803,7 @@ function InteractiveDemoSection() {
                   whileTap={{ scale: 0.9 }}
                 >
                   <Button 
-                    className="rounded-full p-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 shadow-xl transition-all duration-300"
+                    className="rounded-full p-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0 shadow-xl transition-all duration-300"
                     onClick={handleShorten}
                   >
                     <motion.div
@@ -837,7 +827,7 @@ function InteractiveDemoSection() {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
-                <label className="block text-sm font-semibold text-gray-300 mb-2 flex items-center">
+                <label className="text-sm font-semibold text-gray-300 mb-2 flex items-center">
                   <Target className="w-4 h-4 mr-2" />
                   Shortened URL
                 </label>
@@ -920,26 +910,9 @@ function InteractiveDemoSection() {
 // Enhanced CTA Section (Same as before)
 function CTASection() {
   return (
-    <section id="pricing" className="py-24 px-6 bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-600 relative overflow-hidden">
-      <ShootingStars />
-      <BackgroundBeams />
-      
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute inset-0 opacity-30"
-          animate={{
-            background: [
-              "radial-gradient(circle at 20% 50%, #3b82f6 0%, transparent 50%)",
-              "radial-gradient(circle at 80% 50%, #8b5cf6 0%, transparent 50%)",
-              "radial-gradient(circle at 50% 80%, #06b6d4 0%, transparent 50%)",
-              "radial-gradient(circle at 20% 50%, #3b82f6 0%, transparent 50%)",
-            ],
-          }}
-          transition={{ duration: 10, repeat: Infinity }}
-        />
-      </div>
-      
-      <div className="absolute inset-0 bg-black/20" />
+    <section id="pricing" className="py-24 px-6 bg-black relative overflow-hidden">
+      <div className="absolute top-0 left-1/3 w-72 h-72 bg-white/5 rounded-full filter blur-3xl"></div>
+      <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-gray-800/30 rounded-full filter blur-3xl"></div>
       
       <div className="max-w-4xl mx-auto text-center relative z-10">
         <motion.div
@@ -948,25 +921,20 @@ function CTASection() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <Badge className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-full relative overflow-hidden group">
-            <motion.div
-              className="absolute inset-0 bg-white/20"
-              animate={{ x: ["-100%", "100%"] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            />
-            <Sparkles className="w-4 h-4 mr-2 relative z-10" />
-            <span className="relative z-10">Get Started Today</span>
+          <Badge className="mb-6 bg-white/10 backdrop-blur-sm border border-white/20 text-white px-4 py-2 rounded-full">
+            <Sparkles className="w-4 h-4 mr-2" />
+            <span className="font-medium">Get Started Today</span>
           </Badge>
           
           <TextAnimate
-            className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight"
+            className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight leading-tight"
             delay={0.2}
           >
             Ready to get started?
           </TextAnimate>
           
           <motion.p
-            className="text-lg text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed"
+            className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -989,12 +957,12 @@ function CTASection() {
               <Button size="lg" asChild className="text-base px-8 py-3 bg-white text-black hover:bg-gray-100 rounded-xl shadow-xl transition-all duration-500 relative overflow-hidden">
                 <Link href="/auth/signup">
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20"
+                    className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-pink-500/20"
                     initial={{ x: "-100%" }}
                     whileHover={{ x: "100%" }}
                     transition={{ duration: 0.6 }}
                   />
-                  <span className="relative z-10">Start for free</span>
+                  <span className="relative z-10 font-inter">Start for free</span>
                   <ArrowRight className="ml-2 w-4 h-4 relative z-10" />
                 </Link>
               </Button>
@@ -1004,7 +972,7 @@ function CTASection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Button size="lg" variant="outline" asChild className="text-base px-8 py-3 bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 rounded-xl transition-all duration-500">
+              <Button size="lg" variant="outline" asChild className="text-base px-8 py-3 bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 rounded-xl transition-all duration-500 font-inter">
                 <Link href="/contact">
                   <MessageCircle className="mr-2 w-4 h-4" />
                   Contact sales
@@ -1029,10 +997,9 @@ function CTASection() {
                 key={item.text}
                 className="flex items-center space-x-2 text-sm font-medium"
                 whileHover={{ scale: 1.05, color: "#ffffff" }}
-                transition={{ duration: 0.2 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 + 0.9 }}
+                transition={{ duration: 0.2, delay: index * 0.1 + 0.9 }}
               >
                 <motion.div
                   whileHover={{ scale: 1.2, rotate: 360 }}
@@ -1074,11 +1041,15 @@ function Footer() {
           >
             <Link href="/" className="flex items-center space-x-3 mb-4 group">
               <motion.div 
-                className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-xl"
+                className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-xl overflow-hidden border border-gray-200"
                 whileHover={{ scale: 1.1, rotate: 360 }}
                 transition={{ duration: 0.6, type: "spring" }}
               >
-                <LinkIcon className="w-5 h-5 text-white" />
+                <img 
+                  src="/logo.png" 
+                  alt="LinkWeaver Logo" 
+                  className="w-8 h-8 object-contain"
+                />
               </motion.div>
               <span className="font-bold text-xl text-white">LinkWeaver</span>
             </Link>
@@ -1179,14 +1150,20 @@ function Footer() {
 // Main Component
 export default function LinkWeaverLanding() {
   return (
-    <div className="min-h-screen bg-black antialiased selection:bg-blue-500/20">
-      <Navigation />
-      <HeroSection />
-      <FeaturesSection />
-      <InteractiveDemoSection />
-      {/* Removed TestimonialsSection */}
-      <CTASection />
-      <Footer />
+    <div className="min-h-screen bg-black font-sans antialiased selection:bg-blue-500/20 text-white">
+      {/* Sophisticated black-based gradients */}
+      <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+      <div className="fixed inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30"></div>
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.1),rgba(0,0,0,0.8))]"></div>
+      
+      <div className="relative z-10">
+        <Navigation />
+        <HeroSection />
+        <FeaturesSection />
+        <InteractiveDemoSection />
+        <CTASection />
+        <Footer />
+      </div>
     </div>
   )
 }

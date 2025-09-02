@@ -44,7 +44,7 @@ export default function SigninPage() {
     try {
       await signIn(data.username, data.password);
       toast({
-        title: "Welcome back!",
+        title: "",
       });
       router.push('/dashboard');
     } catch (error: any) {
@@ -58,8 +58,8 @@ export default function SigninPage() {
 
   const handleOAuthSignin = (provider: "github" | "google") => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-      const frontendUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const frontendUrl = process.env.NEXT_PUBLIC_APP_URL ;
       const redirectUrl = `${apiUrl}/api/oauth/${provider}?redirect_uri=${encodeURIComponent(frontendUrl + '/auth/oauth/callback')}`;
       
       console.log(`Redirecting to: ${redirectUrl}`);

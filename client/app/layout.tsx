@@ -1,7 +1,7 @@
 // app/layout.tsx
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, JetBrains_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono, DM_Sans, Work_Sans } from "next/font/google"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"  // Import from mono, not sans!
 import localFont from "next/font/local"
@@ -10,13 +10,29 @@ import { ThemeProvider } from "@/contexts/theme-context"
 import { AuthProvider } from "@/components/auth-provider"
 import { Toaster } from "@/components/ui/toaster"
 
-// Optimized font loading with proper fallbacks
+// Optimized premium font loading with proper fallbacks
 const inter = Inter({ 
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
   preload: true,
   fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"]
+})
+
+// DM Sans for secondary content and body text
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+  fallback: ["Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"]
+})
+
+// Work Sans for versatile UI elements (recommended by experts)
+const workSans = Work_Sans({
+  subsets: ["latin"],
+  variable: "--font-work-sans",
+  display: "swap", 
+  fallback: ["Inter", "DM Sans", "system-ui", "sans-serif"]
 })
 
 const jetbrainsMono = JetBrains_Mono({
@@ -26,7 +42,7 @@ const jetbrainsMono = JetBrains_Mono({
   fallback: ["Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"]
 })
 
-// Geist fonts from NPM package (correct imports!)
+// Geist fonts from NPM package with proper variable configuration
 const geistSans = GeistSans
 const geistMono = GeistMono
 
@@ -47,7 +63,7 @@ const calSans = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://linkweaver.bhavya.live'),
   title: {
-    default: "LinkWeaver - Advanced Link Management & Analytics Platform",
+    default: "LinkWeaver ",
     template: "%s | LinkWeaver"
   },
   description: "Create stunning bio pages, track analytics with precision, and manage your digital presence. The most advanced link management platform for creators, marketers, and businesses.",
@@ -75,21 +91,14 @@ export const metadata: Metadata = {
   // Enhanced icons with multiple formats
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
       { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
-      { url: "/icon-512.png", type: "image/png", sizes: "512x512" }
+      { url: "/logo.png", type: "image/png", sizes: "32x32" },
+      { url: "/logo.png", type: "image/png", sizes: "16x16" },
+      { url: "/logo.png", type: "image/png", sizes: "48x48" }
     ],
-    shortcut: "/favicon.ico",
+    shortcut: "/icon.svg",
     apple: [
-      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" }
-    ],
-    other: [
-      {
-        rel: "mask-icon",
-        url: "/safari-pinned-tab.svg",
-        color: "#000000"
-      }
+      { url: "/logo.png", sizes: "180x180", type: "image/png" }
     ]
   },
 
@@ -99,14 +108,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: process.env.NEXT_PUBLIC_APP_URL || 'https://linkweaver.bhavya.live',
     siteName: "LinkWeaver",
-    title: "LinkWeaver - Advanced Link Management & Analytics Platform",
+    title: "LinkWeaver ",
     description: "Create stunning bio pages, track analytics with precision, and manage your digital presence. The most advanced link management platform built for modern creators.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "LinkWeaver - Advanced Link Management Platform",
+        alt: "LinkWeaver ",
         type: "image/png"
       },
       {
@@ -124,7 +133,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@linkweaver",
     creator: "@bhavyabuilds",
-    title: "LinkWeaver - Advanced Link Management Platform",
+    title: "LinkWeaver",
     description: "Create stunning bio pages, track analytics with precision, and manage your digital presence like never before.",
     images: {
       url: "/twitter-image.png",
@@ -242,15 +251,12 @@ export default function RootLayout({
         />
       </head>
       <body 
-        className={`${geistSans.className} font-sans antialiased`}
+        className={`${inter.className} ${inter.variable} ${dmSans.variable} ${workSans.variable} ${jetbrainsMono.variable} ${geistSans.variable} ${geistMono.variable} ${calSans.variable} antialiased`}
         suppressHydrationWarning
       >
         <ThemeProvider 
-          attribute="class"
           defaultTheme="system" 
-          enableSystem={true}
           storageKey="linkweaver-theme"
-          disableTransitionOnChange={false}
         >
           <AuthProvider>
             <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 antialiased selection:bg-zinc-200 dark:selection:bg-zinc-800">

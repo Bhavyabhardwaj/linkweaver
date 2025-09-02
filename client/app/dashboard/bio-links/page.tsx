@@ -144,20 +144,20 @@ const themes: BioTheme[] = [
   {
     id: "corporate-blue",
     name: "Corporate Blue",
-    preview: "bg-blue-50 text-blue-900",
+    preview: "bg-emerald-50 text-emerald-900",
     background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)",
     textColor: "#1e3a8a",
-    buttonStyle: "rounded-lg bg-blue-600 text-white hover:bg-blue-700",
-    cardStyle: "bg-white border border-blue-200 shadow-sm",
+    buttonStyle: "rounded-lg bg-emerald-600 text-white hover:bg-emerald-700",
+    cardStyle: "bg-white border border-emerald-200 shadow-sm",
   },
   {
     id: "creative-purple",
     name: "Creative Purple",
-    preview: "bg-purple-50 text-purple-900",
+    preview: "bg-teal-50 text-teal-900",
     background: "linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%)",
     textColor: "#581c87",
-    buttonStyle: "rounded-lg bg-purple-600 text-white hover:bg-purple-700",
-    cardStyle: "bg-white border border-purple-200 shadow-sm",
+    buttonStyle: "rounded-lg bg-teal-600 text-white hover:bg-teal-700",
+    cardStyle: "bg-white border border-teal-200 shadow-sm",
   },
   {
     id: "retro-vibes",
@@ -207,7 +207,7 @@ export default function BioLinksPage() {
   })
   const [totalViews, setTotalViews] = useState<number>(0);
   const [copied, setCopied] = useState(false);
-  const [showInactive, setShowInactive] = useState(true); // Show inactive links by default
+  const [showInactive, setShowInactive] = useState(true);
 
   const { user } = useAuth()
   const { toast } = useToast()
@@ -220,7 +220,6 @@ export default function BioLinksPage() {
         name: user.name || prev.name,
         username: user.username || prev.username,
         avatar: user.avatar || prev.avatar,
-        // Optionally, set bio if you store it in user object
       }))
     }
   }, [user])
@@ -383,7 +382,6 @@ export default function BioLinksPage() {
 
   const reorderLinks = async (newOrder: BioLink[]) => {
     setLinks(newOrder)
-
     try {
       const linkIds = newOrder.map((link) => link.id)
       await apiClient.reorderBioLinks(linkIds)
@@ -432,58 +430,63 @@ export default function BioLinksPage() {
     const currentTheme = themes.find((t) => t.id === selectedTheme) || themes[0]
 
     return (
-      <div
-        className={`mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 ${
-          previewMode === "mobile" ? "w-80 h-[600px]" : "w-full max-w-md h-[700px]"
-        }`}
-        style={{
-          background: currentTheme.background,
-          color: currentTheme.textColor,
-        }}
-      >
-        {/* Phone header */}
-        {previewMode === "mobile" && (
-          <div className="h-6 bg-black/10 flex items-center justify-center">
-            <div className="w-16 h-1 bg-white/50 rounded-full" />
-          </div>
-        )}
+      <div className="w-full max-w-sm mx-auto">
+        <div
+          className={`bg-background border border-border rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 ${
+            previewMode === "mobile" ? "w-full aspect-[9/16]" : "w-full aspect-[3/4]"
+          }`}
+          style={{
+            background: currentTheme.background,
+            color: currentTheme.textColor,
+          }}
+        >
+          {/* Phone header */}
+          {previewMode === "mobile" && (
+            <div className="h-6 bg-black/10 flex items-center justify-center">
+              <div className="w-16 h-1 bg-white/50 rounded-full" />
+            </div>
+          )}
 
-        <div className="p-6 text-center h-full overflow-y-auto">
-          <Avatar className="w-20 h-20 mx-auto mb-4">
-            <AvatarImage src={profileSettings.avatar || "/placeholder.svg"} />
-            <AvatarFallback>{profileSettings.name[0]}</AvatarFallback>
-          </Avatar>
-          <h2 className="text-xl font-bold mb-2">{profileSettings.name}</h2>
-          <p className="text-sm mb-6 opacity-80">{profileSettings.bio}</p>
+          <div className="p-4 text-center h-full overflow-y-auto">
+            <Avatar className="w-16 h-16 mx-auto mb-3">
+              <AvatarImage src={profileSettings.avatar || "/placeholder.svg"} />
+              <AvatarFallback>{profileSettings.name[0]}</AvatarFallback>
+            </Avatar>
+            <h2 className="text-lg font-bold mb-2">{profileSettings.name}</h2>
+            <p className="text-sm mb-4 opacity-80 line-clamp-2">{profileSettings.bio}</p>
 
-          <div className="space-y-3">
-            {links
-              .sort((a, b) => a.order - b.order)
-              .map((link, index) => (
-                <motion.div
-                  key={link.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="p-4 rounded-lg hover:scale-105 transition-all duration-200 cursor-pointer group"
-                  style={{
-                    background: currentTheme.cardStyle.includes("bg-white")
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.1)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{link.icon}</span>
-                    <div className="flex-1 text-left">
-                      <p className="font-medium">{link.title}</p>
-                      {link.description && <p className="text-sm opacity-70">{link.description}</p>}
+            <div className="space-y-2">
+              {links
+                .sort((a, b) => a.order - b.order)
+                .slice(0, 5) // Limit to 5 links for preview
+                .map((link, index) => (
+                  <motion.div
+                    key={link.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="p-3 rounded-lg hover:scale-105 transition-all duration-200 cursor-pointer group"
+                    style={{
+                      background: currentTheme.cardStyle.includes("bg-white")
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(0, 0, 0, 0.1)",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{link.icon}</span>
+                      <div className="flex-1 text-left min-w-0">
+                        <p className="font-medium text-sm truncate">{link.title}</p>
+                        {link.description && (
+                          <p className="text-xs opacity-70 truncate">{link.description}</p>
+                        )}
+                      </div>
+                      <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                     </div>
-                    <ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+            </div>
           </div>
         </div>
       </div>
@@ -494,7 +497,7 @@ export default function BioLinksPage() {
     return (
       <ProtectedRoute>
         <DashboardLayout>
-          <div className="space-y-6">
+          <div className="space-y-6 px-4 sm:px-6 lg:px-0">
             <Skeleton className="h-12 w-full" />
             <div className="grid lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
@@ -512,26 +515,26 @@ export default function BioLinksPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-0 pb-6 max-w-full overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Bio Links</h1>
-              <p className="text-muted-foreground">Manage your bio page and links</p>
+              <h1 className="text-2xl sm:text-3xl font-bold font-inter">Bio Links</h1>
+              <p className="text-muted-foreground font-dm-sans text-sm sm:text-base">Manage your bio page and links</p>
             </div>
-            <div className="flex items-center gap-4">
-              <Button variant="outline" onClick={openPreview}>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+              <Button variant="outline" onClick={openPreview} className="font-work-sans">
                 <Eye className="w-4 h-4 mr-2" />
                 Preview
               </Button>
               <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
+                  <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity font-work-sans">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Link
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px] mx-4 sm:mx-0 max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Add Bio Link</DialogTitle>
                     <DialogDescription>Create a new link for your bio page</DialogDescription>
@@ -567,11 +570,11 @@ export default function BioLinksPage() {
                       <Input id="icon" placeholder="🌐" {...form.register("icon")} />
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                    <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                      <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)} className="order-2 sm:order-1">
                         Cancel
                       </Button>
-                      <Button type="submit" disabled={isCreating}>
+                      <Button type="submit" disabled={isCreating} className="order-1 sm:order-2">
                         {isCreating ? "Creating..." : "Create Link"}
                       </Button>
                     </div>
@@ -582,75 +585,346 @@ export default function BioLinksPage() {
           </div>
 
           {/* Shareable bio link */}
-          <div className="flex items-center gap-2 mb-6">
-            <span className="font-medium">Your Bio Link:</span>
-            <Input
-              value={`${process.env.NEXT_PUBLIC_API_URL || 'https://linkweaver.bhavya.live'}/u/${profileSettings.username}`}
-              readOnly
-              className="w-[320px] text-xs bg-muted/50 cursor-pointer"
-              onClick={handleCopy}
-            />
-            <Button size="sm" variant="outline" onClick={handleCopy}>
-              {copied ? "Copied!" : "Copy Link"}
-            </Button>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+            <span className="font-medium text-sm sm:text-base whitespace-nowrap">Your Bio Link:</span>
+            <div className="flex flex-1 gap-2">
+              <Input
+                value={`${process.env.NEXT_PUBLIC_API_URL || 'https://linkweaver.bhavya.live'}/u/${profileSettings.username}`}
+                readOnly
+                className="text-xs sm:text-sm bg-muted/50 cursor-pointer flex-1 min-w-0"
+                onClick={handleCopy}
+              />
+              <Button size="sm" variant="outline" onClick={handleCopy} className="whitespace-nowrap">
+                {copied ? "Copied!" : "Copy"}
+              </Button>
+            </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Views</p>
-                    <p className="text-2xl font-bold">{totalViews}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Views</p>
+                    <p className="text-xl sm:text-2xl font-bold">{totalViews}</p>
                   </div>
-                  <Eye className="w-8 h-8 text-primary" />
+                  <Eye className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Active Links</p>
-                    <p className="text-2xl font-bold">{links.length}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Links</p>
+                    <p className="text-xl sm:text-2xl font-bold">{links.filter(l => l.active).length}</p>
                   </div>
-                  <ExternalLink className="w-8 h-8 text-secondary" />
+                  <ExternalLink className="w-6 h-6 sm:w-8 sm:h-8 text-secondary" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Clicks</p>
-                    <p className="text-2xl font-bold">{links.reduce((sum, link) => sum + link.clicks, 0)}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Clicks</p>
+                    <p className="text-xl sm:text-2xl font-bold">{links.reduce((sum, link) => sum + link.clicks, 0)}</p>
                   </div>
-                  <BarChart3 className="w-8 h-8 text-accent" />
+                  <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">This Month</p>
-                    <p className="text-2xl font-bold">+23%</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">This Month</p>
+                    <p className="text-xl sm:text-2xl font-bold">+23%</p>
                   </div>
-                  <Calendar className="w-8 h-8 text-orange-500" />
+                  <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          {/* Mobile-first single column layout */}
+          <div className="space-y-6 lg:hidden">
+            {/* Links Management - Mobile */}
+            <Card className="bg-card border-border">
+              <CardHeader className="p-4">
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <GripVertical className="w-4 h-4" />
+                      Your Links
+                    </CardTitle>
+                    <CardDescription className="text-sm">
+                      Drag and drop to reorder your links
+                      {links.length > 0 && (
+                        <span className="block text-xs text-muted-foreground mt-1">
+                          ({links.filter(l => l.active).length} active, {links.filter(l => !l.active).length} inactive)
+                        </span>
+                      )}
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowInactive(!showInactive)}
+                      className="text-xs"
+                    >
+                      <Eye className="w-3 h-3 mr-1" />
+                      {showInactive ? 'Hide Inactive' : 'Show Inactive'}
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4">
+                {links.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="mx-auto h-8 w-8 text-muted-foreground" />
+                    <h3 className="mt-4 text-base font-semibold">No bio links yet</h3>
+                    <p className="text-muted-foreground text-sm">Create your first bio link to get started</p>
+                    <Button className="mt-4" onClick={() => setCreateDialogOpen(true)}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Link
+                    </Button>
+                  </div>
+                ) : (
+                  <Reorder.Group axis="y" values={links} onReorder={reorderLinks} className="space-y-3">
+                    {links
+                      .filter(link => showInactive || link.active)
+                      .sort((a, b) => a.order - b.order)
+                      .map((link) => (
+                        <Reorder.Item key={link.id} value={link}>
+                          <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileDrag={{ scale: 1.05 }}
+                            className={`p-3 bg-background border border-border rounded-lg hover:border-primary/50 transition-all duration-200 cursor-grab active:cursor-grabbing ${!link.active ? 'opacity-60' : ''}`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+                              <div className="flex items-start gap-2 flex-1 min-w-0">
+                                <span className="text-xl flex-shrink-0">{link.icon}</span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex flex-col gap-1 mb-1">
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-medium truncate text-sm">{link.title}</p>
+                                      <Badge variant={link.active ? "default" : "secondary"} className="text-xs flex-shrink-0">
+                                        {link.active ? "Active" : "Inactive"}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground truncate mb-1">{link.url}</p>
+                                  <p className="text-xs text-muted-foreground">{link.clicks} clicks</p>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                <Switch 
+                                  checked={link.active} 
+                                  onCheckedChange={() => toggleLinkStatus(link.id)}
+                                />
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="p-1 h-8 w-8">
+                                      <MoreHorizontal className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => startEdit(link)}>
+                                      <Edit className="w-4 h-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => copyToClipboard(link.url)}>
+                                      <Copy className="w-4 h-4 mr-2" />
+                                      Copy URL
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => window.open(link.url, "_blank")}> 
+                                      <ExternalLink className="w-4 h-4 mr-2" />
+                                      Visit Link
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setLinkToDelete(link.id)
+                                        setDeleteDialogOpen(true)
+                                      }}
+                                      className="text-destructive"
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          </motion.div>
+                        </Reorder.Item>
+                      ))}
+                  </Reorder.Group>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Live Preview - Mobile */}
+            <Card className="bg-card border-border">
+              <CardHeader className="p-4">
+                <CardTitle className="flex flex-col gap-3">
+                  <span className="text-base">Live Preview</span>
+                  <div className="flex items-center gap-2 self-start">
+                    <Button
+                      variant={previewMode === "mobile" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPreviewMode("mobile")}
+                    >
+                      <Smartphone className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant={previewMode === "desktop" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPreviewMode("desktop")}
+                    >
+                      <Monitor className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardTitle>
+                <CardDescription className="text-sm">See how your bio page looks to visitors</CardDescription>
+              </CardHeader>
+              <CardContent className="p-4">
+                <BioPreview />
+              </CardContent>
+            </Card>
+
+            {/* Theme Customization - Mobile */}
+            <Card className="bg-card border-border">
+              <CardHeader className="p-4">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Palette className="w-4 h-4" />
+                  Theme Customization
+                </CardTitle>
+                <CardDescription className="text-sm">Choose from professional themes for your bio page</CardDescription>
+              </CardHeader>
+              <CardContent className="p-4">
+                <Tabs defaultValue="themes" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 text-xs">
+                    <TabsTrigger value="themes">Themes</TabsTrigger>
+                    <TabsTrigger value="layout">Layout</TabsTrigger>
+                    <TabsTrigger value="profile">Profile</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="themes" className="space-y-4 mt-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      {themes.map((theme) => (
+                        <motion.div
+                          key={theme.id}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`aspect-video rounded-lg cursor-pointer border-2 transition-all ${
+                            selectedTheme === theme.id ? "border-primary shadow-lg" : "border-transparent"
+                          } ${theme.preview}`}
+                          onClick={() => setSelectedTheme(theme.id)}
+                        >
+                          <div className="p-2 h-full flex flex-col justify-between">
+                            <div className="text-xs font-medium">{theme.name}</div>
+                            <div className="space-y-1">
+                              <div className="h-1 bg-current opacity-50 rounded" />
+                              <div className="h-1 bg-current opacity-30 rounded w-3/4" />
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="layout" className="space-y-4 mt-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Rounded corners</span>
+                        <Switch defaultChecked />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Show descriptions</span>
+                        <Switch defaultChecked />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Show click counts</span>
+                        <Switch />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Center alignment</span>
+                        <Switch defaultChecked />
+                      </div>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="profile" className="space-y-4 mt-4">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm">Display Name</Label>
+                        <Input
+                          value={profileSettings.name}
+                          onChange={(e) => setProfileSettings((prev) => ({ ...prev, name: e.target.value }))}
+                          className="text-sm"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">Bio</Label>
+                        <Textarea
+                          value={profileSettings.bio}
+                          onChange={(e) => setProfileSettings((prev) => ({ ...prev, bio: e.target.value }))}
+                          rows={3}
+                          className="text-sm resize-none"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">Username</Label>
+                        <Input
+                          value={profileSettings.username}
+                          onChange={(e) => setProfileSettings((prev) => ({ ...prev, username: e.target.value }))}
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Quick Stats - Mobile */}
+            <Card className="bg-card border-border">
+              <CardHeader className="p-4">
+                <CardTitle className="text-base">Bio Page Stats</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Total views</span>
+                  <span className="font-semibold">{totalViews}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Active links</span>
+                  <span className="font-semibold">{links.filter(l => l.active).length}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Total clicks</span>
+                  <span className="font-semibold">{links.reduce((sum, link) => sum + link.clicks, 0)}</span>
+                </div>
+                <Separator />
+                <Button variant="outline" className="w-full bg-transparent" onClick={openPreview}>
+                  <Globe className="w-4 h-4 mr-2" />
+                  View Public Page
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Desktop layout (unchanged) */}
+          <div className="hidden lg:grid lg:grid-cols-3 gap-8">
             {/* Links Management */}
             <div className="lg:col-span-2 space-y-6">
               <Card className="bg-card border-border">
-                <CardHeader>
+                <CardHeader className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="flex items-center gap-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
                         <GripVertical className="w-5 h-5" />
                         Your Links
                       </CardTitle>
@@ -676,7 +950,7 @@ export default function BioLinksPage() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   {links.length === 0 ? (
                     <div className="text-center py-12">
                       <Users className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -690,7 +964,7 @@ export default function BioLinksPage() {
                   ) : (
                     <Reorder.Group axis="y" values={links} onReorder={reorderLinks} className="space-y-3">
                       {links
-                        .filter(link => showInactive || link.active) // Filter based on showInactive toggle
+                        .filter(link => showInactive || link.active)
                         .sort((a, b) => a.order - b.order)
                         .map((link) => (
                           <Reorder.Item key={link.id} value={link}>
@@ -700,9 +974,9 @@ export default function BioLinksPage() {
                               className={`p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-all duration-200 cursor-grab active:cursor-grabbing ${!link.active ? 'opacity-60' : ''}`}
                             >
                               <div className="flex items-center gap-4">
-                                <GripVertical className="w-5 h-5 text-muted-foreground" />
-                                <div className="flex items-center gap-3 flex-1">
-                                  <span className="text-2xl">{link.icon}</span>
+                                <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  <span className="text-2xl flex-shrink-0">{link.icon}</span>
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
                                       <p className="font-medium truncate">{link.title}</p>
@@ -714,8 +988,11 @@ export default function BioLinksPage() {
                                     <p className="text-xs text-muted-foreground mt-1">{link.clicks} clicks</p>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <Switch checked={link.active} onCheckedChange={() => toggleLinkStatus(link.id)} />
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <Switch 
+                                    checked={link.active} 
+                                    onCheckedChange={() => toggleLinkStatus(link.id)}
+                                  />
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button variant="ghost" size="sm">
@@ -760,14 +1037,14 @@ export default function BioLinksPage() {
 
               {/* Customization Options */}
               <Card className="bg-card border-border">
-                <CardHeader>
+                <CardHeader className="p-6">
                   <CardTitle className="flex items-center gap-2">
                     <Palette className="w-5 h-5" />
                     Theme Customization
                   </CardTitle>
                   <CardDescription>Choose from professional themes for your bio page</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   <Tabs defaultValue="themes" className="w-full">
                     <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="themes">Themes</TabsTrigger>
@@ -851,7 +1128,7 @@ export default function BioLinksPage() {
             {/* Live Preview */}
             <div className="space-y-6">
               <Card className="bg-card border-border">
-                <CardHeader>
+                <CardHeader className="p-6">
                   <CardTitle className="flex items-center justify-between">
                     <span>Live Preview</span>
                     <div className="flex items-center gap-2">
@@ -873,24 +1150,24 @@ export default function BioLinksPage() {
                   </CardTitle>
                   <CardDescription>See how your bio page looks to visitors</CardDescription>
                 </CardHeader>
-                <CardContent className="flex justify-center">
+                <CardContent className="flex justify-center p-6">
                   <BioPreview />
                 </CardContent>
               </Card>
 
               {/* Quick Stats */}
               <Card className="bg-card border-border">
-                <CardHeader>
+                <CardHeader className="p-6">
                   <CardTitle>Bio Page Stats</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 p-6">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Total views</span>
                     <span className="font-semibold">{totalViews}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Active links</span>
-                    <span className="font-semibold">{links.length}</span>
+                    <span className="font-semibold">{links.filter(l => l.active).length}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Total clicks</span>
@@ -908,7 +1185,7 @@ export default function BioLinksPage() {
 
           {/* Edit Dialog */}
           <Dialog open={!!editingLink} onOpenChange={() => setEditingLink(null)}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] mx-4 sm:mx-0 max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Bio Link</DialogTitle>
                 <DialogDescription>Update your bio link information</DialogDescription>
@@ -941,11 +1218,11 @@ export default function BioLinksPage() {
                     <Input id="edit-icon" {...editForm.register("icon")} />
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setEditingLink(null)}>
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setEditingLink(null)} className="order-2 sm:order-1">
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={isUpdating}>
+                    <Button type="submit" disabled={isUpdating} className="order-1 sm:order-2">
                       {isUpdating ? "Updating..." : "Update Link"}
                     </Button>
                   </div>
@@ -956,7 +1233,7 @@ export default function BioLinksPage() {
 
           {/* Delete Confirmation Dialog */}
           <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-            <AlertDialogContent>
+            <AlertDialogContent className="mx-4 sm:mx-0">
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>

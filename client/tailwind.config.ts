@@ -19,11 +19,13 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "var(--font-inter)", "system-ui", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "var(--font-mono)", "monospace"],
-        cal: ["var(--font-cal-sans)", "var(--font-geist-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)", "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "var(--font-mono)", "JetBrains Mono", "monospace"],
+        cal: ["var(--font-cal-sans)", "var(--font-inter)", "Inter", "system-ui", "sans-serif"],
         geist: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
-        inter: ["var(--font-inter)", "system-ui", "sans-serif"],
+        inter: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        "dm-sans": ["var(--font-dm-sans)", "DM Sans", "Inter", "system-ui", "sans-serif"],
+        "work-sans": ["var(--font-work-sans)", "Work Sans", "Inter", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

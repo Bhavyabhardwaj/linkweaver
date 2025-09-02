@@ -223,20 +223,20 @@ export default function QRCodesPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">QR Codes</h1>
-              <p className="text-muted-foreground">Generate and manage QR codes for your links</p>
+              <h1 className="text-3xl font-bold font-inter">QR Codes</h1>
+              <p className="text-muted-foreground font-dm-sans">Generate and manage QR codes for your links</p>
             </div>
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-primary hover:bg-primary/90">
+                <Button className="bg-primary hover:bg-primary/90 font-work-sans">
                   <Plus className="w-4 h-4 mr-2" />
                   Generate QR Code
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle>Generate QR Code</DialogTitle>
-                  <DialogDescription>Create a QR code for any URL with customizable options.</DialogDescription>
+                  <DialogTitle className="font-inter">Generate QR Code</DialogTitle>
+                  <DialogDescription className="font-dm-sans">Create a QR code for any URL with customizable options.</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={form.handleSubmit(generateQRCode)} className="space-y-4">
                   <div className="space-y-2">
