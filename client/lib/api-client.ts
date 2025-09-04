@@ -2,7 +2,7 @@
 
 // Environment-based API configuration for deployment
 const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? ''
+  ? 'https://linkweaver.bhavya.live'
   : 'http://localhost:3000'
 
 // API client with caching and performance optimizations
@@ -254,7 +254,7 @@ class ApiClient {
 
   // Public Profile
   async getPublicProfile(username: string) {
-    return this.request(`/u/${username}`, {}, true, 120000) // Cache for 2 minutes
+    return this.request(`/api/public/u/${username}`, {}, true, 120000) // Cache for 2 minutes
   }
 
   // Public Bio Page
