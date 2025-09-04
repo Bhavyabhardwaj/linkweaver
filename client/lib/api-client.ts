@@ -1,6 +1,9 @@
 'use client'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://linkweaver.bhavya.live'
+// Environment-based API configuration for deployment
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? ''
+  : 'http://localhost:3000'
 
 // API client with caching and performance optimizations
 class ApiClient {
@@ -20,13 +23,13 @@ class ApiClient {
   private getFromCache(key: string): any | null {
     const cached = this.cache.get(key)
     if (!cached) return null
-    
+
     const now = Date.now()
     if (now - cached.timestamp > cached.ttl) {
       this.cache.delete(key)
       return null
     }
-    
+
     return cached.data
   }
 
@@ -39,7 +42,8 @@ class ApiClient {
   }
 
   private async request(endpoint: string, options: RequestInit = {}, useCache: boolean = false, cacheTTL?: number): Promise<any> {
-    const url = `${this.baseURL}${endpoint}`
+    // For production, use relative URLs; for development, use full URL
+    const url = this.baseURL ? `${this.baseURL}${endpoint}` : endpoint
     const cacheKey = `${url}_${JSON.stringify(options)}`
 
     // Check cache first for GET requests
@@ -205,7 +209,7 @@ class ApiClient {
 
       // Calculate total clicks from all links
       const totalClicks = bioLinks.reduce((sum: number, link: any) => sum + (link._count?.linkClicks || 0), 0) +
-                         shortLinks.reduce((sum: number, link: any) => sum + (link.clickCount || 0), 0);
+        shortLinks.reduce((sum: number, link: any) => sum + (link.clickCount || 0), 0);
 
       // Calculate total active links
       const totalLinks = bioLinks.length + shortLinks.length;

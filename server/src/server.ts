@@ -30,6 +30,7 @@ const corsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     const allowedOrigins = [
       EnvironmentConfig.FRONTEND_URL,
+      'https://linkweaver.bhavya.live',
       'http://localhost:3000',
       'http://localhost:5173',
       'https://localhost:3000',
