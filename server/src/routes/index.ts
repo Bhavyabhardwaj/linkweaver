@@ -15,6 +15,7 @@ const apiRoutes = [
   { path: "/auth", route: authRouter },
   { path: "/links", route: linkRouter, isProtected: true },
   { path: "/qr-codes", route: qrRouter, isProtected: true },
+  { path: "/public", route: publicRouter }, 
   { path: "/oauth", route: githubAuthRouter},
   { path: "/oauth", route: googleAuthRouter},
 ];
@@ -28,6 +29,7 @@ apiRoutes.forEach(({ path, route, isProtected }) => {
   }
 });
 
+// Keep the root public router for redirects and root endpoints
 router.use("/", publicRouter)
 
 export default router;

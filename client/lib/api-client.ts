@@ -259,10 +259,10 @@ class ApiClient {
 
   // Public Bio Page
   async getPublicBioPage(username: string) {
-    return this.request(`/u/${username}`, {}, true, 120000) // Cache for 2 minutes
+    return this.request(`/api/public/u/${username}`, {}, true, 120000) // Cache for 2 minutes
   }
 
-  // Public Link (for slug redirects)
+  // Public Link (for slug redirects) 
   async getPublicLink(slug: string) {
     return this.request(`/${slug}/info`, {}, true, 60000) // Cache for 1 minute
   }
