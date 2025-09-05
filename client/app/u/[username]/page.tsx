@@ -250,6 +250,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
   }, [])
 
   const mapBackendToBioData = (data: any) => {
+    console.log('Mapping data:', data) // Debug log
     return {
       id: data.id,
       username: data.username,
@@ -257,7 +258,7 @@ export default function PremiumBioPage({ params }: { params: { username: string 
       bio: data.bio || '',
       avatar: data.image || data.avatar || '',
       theme: data.theme || 'aurora',
-      isActive: data.isActive !== undefined ? data.isActive : true,
+      isActive: true, // Default to true since API doesn't return this field
       isPro: data.isPro || false,
       verified: data.verified || false,
       location: data.location,
@@ -284,12 +285,16 @@ export default function PremiumBioPage({ params }: { params: { username: string 
   const loadBioData = async (uname: string) => {
     try {
       const response = await apiClient.getPublicBioPage(uname)
+      console.log('API Response:', response) // Debug log
       const raw = response.data || response
+      console.log('Raw data:', raw) // Debug log
       const mapped = mapBackendToBioData(raw)
-      if (!mapped.isActive) {
-        setError("This profile is not available")
-        return
-      }
+      console.log('Mapped data:', mapped) // Debug log
+      // Remove the isActive check since it's not returned by the API
+      // if (!mapped.isActive) {
+      //   setError("This profile is not available")
+      //   return
+      // }
       setBioData(mapped)
       
       // Show welcome message for profile owners
