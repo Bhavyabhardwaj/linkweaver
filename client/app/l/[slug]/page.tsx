@@ -86,7 +86,7 @@ export default function ProtectedLinkPage() {
     setError("")
 
     try {
-      await apiClient.verifyPassword(linkData.id, password)
+      const result = await apiClient.verifyPassword(slug, password)
 
       // Show success message
       toast({
@@ -94,9 +94,9 @@ export default function ProtectedLinkPage() {
         description: "Redirecting to destination...",
       })
 
-      // Simulate redirect delay
+      // Redirect to the destination URL
       setTimeout(() => {
-        window.location.href = linkData.url
+        window.location.href = result.data.redirectUrl
       }, 1500)
     } catch (error) {
       setError("Invalid password. Please try again.")

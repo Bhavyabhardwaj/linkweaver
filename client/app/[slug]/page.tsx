@@ -111,18 +111,21 @@ export default function ShortLinkRedirectPage({ params }: { params: { slug: stri
     setPasswordError("")
 
     try {
-      // For demo purposes, accept common passwords
-      if (password === "demo" || password === "password" || password === "123456") {
-        toast({
-          title: "Password verified!",
-          description: "Redirecting to destination...",
-        })
-        await redirectToDestination(linkData.url)
-      } else {
-        setPasswordError("Incorrect password. Try 'demo', 'password', or '123456'")
-      }
+      const result = await apiClient.verifyPassword(linkData.slug, password)
+      
+      toast({
+        title: "Password verified!",
+        description: "Redirecting to destination...",
+      })
+      
+      await redirectToDestination(result.data.redirectUrl)
     } catch (error: any) {
-      setPasswordError("Failed to verify password")
+      setPasswordError("Incorrect password. Please try again.")
+      toast({
+        title: "Invalid password",
+        description: "Please check your password and try again.",
+        variant: "destructive",
+      })
     } finally {
       setVerifying(false)
     }
