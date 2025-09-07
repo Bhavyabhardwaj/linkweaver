@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔗 Link Manager!
+# 🔗 LinkWeaver!
 
 <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=30&duration=3000&pause=1000&color=4A90E2&center=true&vCenter=true&width=600&lines=Welcome+to+Link+Manager!;Full-Stack+URL+Shortener;Advanced+Analytics+%26+Insights;Built+with+TypeScript+%26+Love" alt="Typing SVG" />
 
@@ -170,8 +170,8 @@ This is a **monorepo** containing both the frontend and backend applications:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Bhavyabhardwaj/Link-manager-server.git
-cd Link-manager-server
+git clone https://github.com/Bhavyabhardwaj/linkweaver-server.git
+cd linkweaver-server
 
 # Install all dependencies (client + server)
 npm run install:all
@@ -217,7 +217,7 @@ npm run dev
    Edit `.env` with your configuration:
    ```env
    # Database
-   DATABASE_URL="postgresql://username:password@localhost:5432/linkmanager"
+   DATABASE_URL="postgresql://username:password@localhost:5432/linkweaver"
    
    # JWT
    JWT_SECRET="your-super-secret-jwt-key"
@@ -318,8 +318,8 @@ We love your contributions! Here's how to get started:
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/Link-manager-server.git
-   cd Link-manager-server
+   git clone https://github.com/YOUR_USERNAME/linkweaver-server.git
+   cd linkweaver-server
    ```
 
 3. **Create a feature branch**
