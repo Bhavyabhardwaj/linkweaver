@@ -267,6 +267,15 @@ class ApiClient {
     return this.request(`/${slug}/info`, {}, true, 60000) // Cache for 1 minute
   }
 
+  // Verify password by calling redirect endpoint with password query param
+  async verifyPassword(slug: string, password: string) {
+    // Use the existing redirect endpoint which handles password verification
+    return this.request(`/${slug}?password=${encodeURIComponent(password)}`, {
+      method: 'GET',
+      // Don't follow redirects in fetch, we want to handle the response
+    })
+  }
+
   // QR Code
   async generateQRCode(data: any) {
     // For standalone QR code creation

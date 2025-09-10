@@ -111,14 +111,18 @@ export default function ShortLinkRedirectPage({ params }: { params: { slug: stri
     setPasswordError("")
 
     try {
-      const result = await apiClient.verifyPassword(linkData.slug, password)
+      // For password verification, we'll directly redirect to the backend URL with password
+      const redirectUrl = `${process.env.NODE_ENV === 'production' ? 'https://linkweaver.bhavya.live' : 'http://localhost:3000'}/${linkData.slug}?password=${encodeURIComponent(password)}`
       
       toast({
         title: "Password verified!",
         description: "Redirecting to destination...",
       })
       
-      await redirectToDestination(result.data.redirectUrl)
+      // Redirect to the backend URL which will handle password verification and final redirect
+      setTimeout(() => {
+        window.location.href = redirectUrl
+      }, 1500)
     } catch (error: any) {
       setPasswordError("Incorrect password. Please try again.")
       toast({
