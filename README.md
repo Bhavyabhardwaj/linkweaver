@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔗 LinkWeaver!.
+# 🔗 LinkWeaver!...
 
 <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=30&duration=3000&pause=1000&color=4A90E2&center=true&vCenter=true&width=600&lines=Welcome+to+Link+Manager!;Full-Stack+URL+Shortener;Advanced+Analytics+%26+Insights;Built+with+TypeScript+%26+Love" alt="Typing SVG" />
 
